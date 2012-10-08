@@ -1,0 +1,10 @@
+enyo.depends(
+  "$lib/underscore",
+  "$lib/backbone",
+  "Model.js",
+  "Collection.js",
+  "Store.js",
+  "CollectionController.js",
+  "ModelController.js",
+  "CollectionRepeater.js"
+);
