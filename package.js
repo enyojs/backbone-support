@@ -1,6 +1,7 @@
 enyo.depends(
-  "$lib/underscore/underscore-min.js",
-  "$lib/backbone/backbone-min.js",
+  "$lib/underscore/underscore.js",
+  "$lib/backbone/backbone.js",
+  "$lib/backbone/examples/backbone-localstorage.js",
   "ext",
   "controllers",
   "models",
