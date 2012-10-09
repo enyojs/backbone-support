@@ -50,6 +50,7 @@
     setupRouter: function () {
       var r = this.router, c = this.controller;
       if (enyo.isString(r)) r = enyo._getPath(r);
+      else return;
       if (!r) return console.warn("enyo.Application: could not " +
         "find the router `" + this.router + "`");
       r = this.router = new r();
@@ -61,7 +62,8 @@
         this._eventQueue.push(arguments);
         return;
       }
-      this.controller.handle.apply(this.controller, arguments);
+      if (!this.controller.handle.apply(this.controller, arguments))
+        this.inherited(arguments);
     },
     controllerChanged: function () {
       this.inherited(arguments);
