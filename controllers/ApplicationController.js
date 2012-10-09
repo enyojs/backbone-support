@@ -5,6 +5,6 @@ enyo.kind({
   beforeHandler: enyo.nop,
   
   handle: function () {
-    enyo._handle.apply(this, arguments);
+    return enyo._handle.apply(this, arguments);
   }
 });

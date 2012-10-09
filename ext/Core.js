@@ -19,7 +19,8 @@
         if (this.beforeHandler) this.beforeHandler(trigger);
         this[trigger].apply(this, args);
       }, arguments);
-    }
+      return true;
+    } else return false;
   };
   
 }());
