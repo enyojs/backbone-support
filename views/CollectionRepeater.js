@@ -13,19 +13,21 @@
       // TODO: THIS IS SO DUMB!!!!
       this.__proto__.destroy.call(this);
     },
+    
+    
     _initAutoBindings: function () {
-      var c = this.get("controller"), ch, ctr, s = [];
+      var c = this.get("controller"), ctr, bindProp, ch;
       if (!c) return;
       for (ch in this.$) {
         if (!this.$.hasOwnProperty(ch)) continue;
-        if (c.get("attributes").indexOf(ch) >= 0 && s.indexOf(ch) === -1) {
-          ctr = this.$[ch];
-          this._autoBinding({
-            from: ".controller." + ch,
-            to: ".$." + ch + this.getBindPropertyFor(ctr)
-          });
-          s.push(ch);
-        }
+        ctr = this.$[ch];
+        bindProp = ctr.bindProperty;
+        if (!bindProp || !(bindProp in c)) continue;
+        this._autoBinding({
+          from: ".controller." + bindProp,
+          to: this.getBindTargetFor(ctr),
+          target: ctr
+        });
       }
     },
     syncBindings: function () {
@@ -35,8 +37,8 @@
         if (b) b.sync(true);
       }
     },
-    getBindPropertyFor: function (inControl) {
-      var r = inControl.get("bindProperty");
+    getBindTargetFor: function (inControl) {
+      var r = inControl.get("bindTarget");
       if (!r) r = ".content";
       return r[0] === "."? r: "." + r;
     },
