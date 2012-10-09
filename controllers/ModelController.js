@@ -45,6 +45,7 @@ enyo.kind({
     m.on("change", enyo.bind(this, this._didUpdate));
     m.on("destroy", enyo.bind(this, this._didDestroy));
     
+    // this is triggering an initial update of the controller...
     for (i = 0; i < attrs.length; ++i) {
       ch[attrs[i]] = true;
     }
