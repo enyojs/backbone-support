@@ -1,0 +1,5 @@
+
+enyo.ModelController
+-----------------------------
+- add support for computed properties automatically being notified when an individual model attribute changes
+- break out the update events so that handling of particular events can be overloaded by subclasses
