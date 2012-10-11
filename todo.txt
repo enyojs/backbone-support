@@ -1,3 +1,6 @@
+lib
+-----------------------------
+- add support for enyo.Ajax based Backbone.sync mechanism so jQuery is not necessary out of the box
 
 enyo.ModelController
 -----------------------------

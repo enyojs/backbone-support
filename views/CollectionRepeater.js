@@ -22,10 +22,11 @@
         if (!this.$.hasOwnProperty(ch)) continue;
         ctr = this.$[ch];
         bindProp = ctr.bindProperty;
-        if (!bindProp || !(bindProp in c)) continue;
+        if (!bindProp) continue;
         this._autoBinding({
-          from: ".controller." + bindProp,
+          from: "." + bindProp,
           to: this.getBindTargetFor(ctr),
+          source: c,
           target: ctr
         });
       }
