@@ -1,7 +1,6 @@
 enyo.depends(
   "foss/underscore/underscore.js",
   "foss/backbone/backbone.js",
-  "foss/backbone/examples/backbone-localstorage.js",
   "ext",
   "controllers",
   "models",

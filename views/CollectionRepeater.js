@@ -104,7 +104,7 @@
     },
     render: function () {
       var i = 0, c, ch, m = this.get("content"), len = this.length, getController, refresh = false;
-      
+        
       getController = function (controller, model) {
         if (c) return c instanceof enyo.Controller? c.set("model", model): new c({model: model});
         if (controller && enyo.isString(controller)) c = enyo._getPath(controller);
@@ -117,7 +117,7 @@
       for (i = 0; i < len; ++i) {
         if ((ch = this.children[i])) {
           ch.controller.set("model", m[i]);
-          ch.controller.set("owner", ch);
+          //ch.controller.set("owner", ch);
           ch.syncBindings();
           refresh = false;
         } else {
@@ -130,7 +130,7 @@
         if (refresh) ch.render();
       }
       
-      if (len < this.children.length) {
+      if (i < this.children.length) {
         ch = this.children.slice(len);
         while (ch.length) {
           c = ch.shift();
@@ -141,6 +141,8 @@
     
     contentChanged: function () {
       var c = this.get("content");
+      
+      if (!c) return;
       
       // as opposed to before, manually set the length property
       // locally once we know the content has been updated

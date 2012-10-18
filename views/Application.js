@@ -37,6 +37,7 @@
     },
     start: function () {
       if (this.main && enyo.isFunction(this.main)) this.main();
+      else if (window.main && enyo.isFunction (window.main)) main.call(this);
       
       // ...and...resume normal create method...
       this.inherited(this._createArguments);
@@ -45,8 +46,23 @@
       if (this.router) this.router.start();
     },
     setup: function () {
+      this.setupStore();
       this.setupRouter();
     },
+    
+    setupStore: function () {
+      var s = this.store;
+      if (enyo.isString(s)) s = enyo._getPath(s);
+      else return;
+      if (!s) return console.warn("enyo.Application: could not " +
+        "find the store `" + this.store + "`");
+      s = this.store = new s();
+      Backbone.sync = enyo.bind(s, function () {
+        // allow for us to swap out sync at any time
+        return s.sync.apply(this, arguments);
+      });
+    },
+    
     setupRouter: function () {
       var r = this.router, c = this.controller;
       if (enyo.isString(r)) r = enyo._getPath(r);

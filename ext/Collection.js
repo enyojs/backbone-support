@@ -8,11 +8,17 @@
     
     _collection: null,
     
+    _properties: [
+      "url"
+    ],
+    
     published: {
       model: null,
       content: null,
       length: 0,
-      collectionProperties: null
+      collectionProperties: null,
+      url: null,
+      status: 0x00
     },
     
     statics: {
@@ -24,11 +30,16 @@
     constructor: function () {
       this.inherited(arguments);
       var ms = this._get("model"), m, b = this._base,
-          p = this._get("collectionProperties") || {};
+          p = this._get("collectionProperties") || {},
+          adtl = {};
       if (enyo.isString(ms)) m = this.model = enyo._getPath(ms);
       if (!m) enyo.error("enyo.Collection: cannot find model " + ms);
       m = new m;
       b = b.extend(enyo.mixin({model: m.model}, p));
+      enyo.forEach(this._properties, function (prop) {
+        adtl[prop] = this[prop];
+      }, this);
+      b = b.extend(adtl);
       this._collection = new b;
       this.setupObservers();
     },
@@ -83,11 +94,21 @@
       this.notifyObservers("content", c, this.content);
     },
     
+    didReset: function (collection, options) {
+      var c = this.content;
+      this.stopNotifications();
+      this.content = collection.models;
+      this.set("length", collection.models.length);
+      this.startNotifications();
+      this.notifyObservers("content", c, this.content);
+    },
+    
     setupObservers: function () {
       var c = this._collection;
       c.on("add", enyo.bind(this, this.didAdd));
       c.on("remove", enyo.bind(this, this.didRemove));
       c.on("change", enyo.bind(this, this.didChange));
+      c.on("reset", enyo.bind(this, this.didReset));
     },
     
     methods: [

@@ -4,18 +4,18 @@ enyo.kind({
   published: {
     collection: null,
     autoLoad: false,
+    status: null
   },
   create: function () {
     this.inherited(arguments);
     this.collectionChanged();
-    if (this.get("autoLoad")) this.load();
+    if (this.get("autoLoad")) enyo.run(this.load, this);
   },
   collectionChanged: function () {
     var cs = this.get("collection"), c;
     if (enyo.isString(cs)) c = this.collection = enyo._getPath(cs);
     else c = this.collection = cs;
-    if (!c) throw new Error("enyo.CollectionController: cannot find collection " +
-      "%.".f(cs));
+    if (!c) throw new Error("enyo.CollectionController: cannot find collection " + cs);
     this.clearBindings();
     if (enyo.isFunction(c)) c = this.collection = new c();
     this.setupBindings();
@@ -32,13 +32,21 @@ enyo.kind({
       from: ".collection.content",
       to: ".content"
     });
+    this.binding({
+      from: ".collection.status",
+      to: ".status",
+      oneWay: true
+    });
 
   },
   
-  load: function () {
-    this.collection.fetch();
+  load: function (options) {
+    this.collection.fetch(options);
   },
-  add: function () {
+  reset: function (models, options) {
+    return this.collection.reset.apply(this.collection, arguments);
+  },
+  add: function (model, options) {
     return this.collection.add.apply(this.collection, arguments);
   },
   remove: function () {
