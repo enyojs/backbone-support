@@ -4,7 +4,8 @@ enyo.kind({
   
   published: {
     model: null,
-    attributes: null
+    attributes: null,
+    lastModel: {}
   },
   
   constructor: function (inProps) {
@@ -22,7 +23,7 @@ enyo.kind({
     
     // if the model doesn't exist or is set to the same
     // model as before do not update anything
-    if (!m || this.lastModel === m) return;
+    if (!m || this.lastModel.cid === m.cid) return;
     
     // update our last model
     this.lastModel = m;
@@ -37,6 +38,7 @@ enyo.kind({
   didUpdate: function (model) {
     var ch, params = model.changedAttributes();
     ch = params? enyo.keys(params): false;
+    console.log("model.didUpdate", ch, params);
     if (ch && ch.length) {
       this.stopNotifications();
       while (ch.length) {
@@ -69,7 +71,7 @@ enyo.kind({
     var r;
     if (this.model) {
       r = this.model.get.apply(this.model, arguments);
-      if (r) return r;
+      if (r !== undefined) return r;
     }
     return this.inherited(arguments);
   },

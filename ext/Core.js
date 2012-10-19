@@ -53,4 +53,12 @@
     }
   };
   
+  // TODO: WTF!??!
+  enyo.Backbone = enyo.Backbone? enyo.Backbone: {};
+  enyo.Backbone.Model = Backbone.Model;
+  enyo.Backbone.Collection = Backbone.Collection;
+  // now attempt to map models to...
+  Backbone.Model = enyo.Model;
+  Backbone.Collection = enyo.Collection;
+  
 }());

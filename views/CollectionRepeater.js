@@ -41,7 +41,9 @@
     getBindTargetFor: function (inControl) {
       var r = inControl.get("bindTarget");
       if (!r) r = ".content";
-      return r[0] === "."? r: "." + r;
+      //return r[0] === "."? r: "." + r;
+      r = r[0] === "."? r: "." + r;
+      return r;
     },
     _controllerChanged: enyo.Observer(function () {
       this._clearAutoBindings();
@@ -141,7 +143,6 @@
     
     contentChanged: function () {
       var c = this.get("content");
-      
       if (!c) return;
       
       // as opposed to before, manually set the length property

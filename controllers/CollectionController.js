@@ -29,7 +29,7 @@ enyo.kind({
       oneWay: true
     });
     this.binding({
-      from: ".collection.content",
+      from: ".collection.models",
       to: ".content"
     });
     this.binding({
