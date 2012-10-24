@@ -25,8 +25,7 @@ enyo.kind({
     
     this.binding({
       from: ".collection.length",
-      to: ".length",
-      oneWay: true
+      to: ".length"
     });
     this.binding({
       from: ".collection.models",
