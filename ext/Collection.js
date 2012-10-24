@@ -9,15 +9,6 @@
       status: 0x00
     },
     
-    //published: {
-    //  model: null,
-    //  content: null,
-    //  length: 0,
-    //  collectionProperties: null,
-    //  url: null,
-    //  status: 0x00
-    //},
-    
     statics: {
       OK: 0x00,
       LOADING: 0x01,
@@ -43,7 +34,7 @@
     },
     
     didFetch: function (callback) {
-      console.log("didFetch", this, arguments);
+      //console.log("didFetch", this, arguments);
       this.set("status", collection.OK);
       this.notifyObservers("models", null, this.models);
       this.notifyObservers("length", null, this.length);
@@ -52,31 +43,31 @@
     },
     
     didError: function (callback) {
-      console.log("didError", this, arguments);
+      //console.log("didError", this, arguments);
       this.set("status", collection.ERROR);
       if (callback && enyo.isFunction(callback))
         callback.apply(this, enyo.toArray(arguments).slice(1));
     },
     
     didAdd: function (model, collection) {
-      console.log("didAdd", this, arguments);
+      //console.log("didAdd", this, arguments);
       this.notifyObservers("models", null, this.models);
       this.notifyObservers("length", null, this.length);
     },
     
     didRemove: function (model, collection, params) {
-      console.log("didRemove", this, arguments);
+      //console.log("didRemove", this, arguments);
       this.notifyObservers("models", null, this.models);
       this.notifyObservers("length", null, this.length);
     },
     
     didChange: function (model, options) {
-      console.log("didChange", this, arguments);
+      //console.log("didChange", this, arguments);
       this.notifyObservers("models", null, this.models);
     },
     
     didReset: function (collection, options) {
-      console.log("didReset", this, arguments);
+      //console.log("didReset", this, arguments);
       this.notifyObservers("models", null, this.models);
       this.notifyObservers("length", null, this.models);
     },
