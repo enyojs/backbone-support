@@ -4,42 +4,40 @@ enyo.kind({
   published: {
     collection: null,
     autoLoad: false,
-    status: null
+    status: null,
+    length: 0,
+    content: null,
+    status: enyo.Collection.OK
   },
   create: function () {
     this.inherited(arguments);
     this.collectionChanged();
     if (this.get("autoLoad")) enyo.run(this.load, this);
   },
+  bindings: [
+    {from: "collection.length", to: "length"},
+    {from: "collection.models", to: "content"},
+    {from: "collection.status", to: "status", oneWay: true}
+  ],
   collectionChanged: function () {
     var cs = this.get("collection"), c;
     if (enyo.isString(cs)) c = this.collection = enyo._getPath(cs);
     else c = this.collection = cs;
-    if (!c) throw new Error("enyo.CollectionController: cannot find collection " + cs);
-    this.clearBindings();
-    if (enyo.isFunction(c)) c = this.collection = new c();
-    this.setupBindings();
-  },
-  setupBindings: function () {
-    var h, e, c = this.collection;
     
-    this.binding({
-      from: ".collection.length",
-      to: ".length"
-    });
-    this.binding({
-      from: ".collection.models",
-      to: ".content"
-    });
-    this.binding({
-      from: ".collection.status",
-      to: ".status",
-      oneWay: true
-    });
-
+    // TODO: probably don't want to throw this error...
+    if (!c) throw new Error("enyo.CollectionController: cannot find collection " + cs);
+    if (enyo.isFunction(c)) c = this.collection = new c();
+    
+    c.owner = this;
+    
+    // call refresh as opposed to _setupBindings since that destroys
+    // bindings we're relying on, this is a proper use-case for refresh
+    this.refreshBindings();
   },
-  
   load: function (options) {
+    this.collection.fetch(options);
+  },
+  fetch: function () {
     this.collection.fetch(options);
   },
   reset: function (models, options) {
