@@ -8,8 +8,10 @@ enyo.kind({
     lastModel: {}
   },
   
+  isModelController: true,
+  
   constructor: function (inProps) {
-    this.model = inProps.model;
+    if (inProps) this.model = inProps.model;
     this.inherited(arguments);
   },
   
@@ -25,6 +27,8 @@ enyo.kind({
     // model as before do not update anything
     if (!m || this.lastModel.cid === m.cid) return;
     
+    if (this.lastModel) this.removeModel(this.lastModel);
+    
     // update our last model
     this.lastModel = m;
     
@@ -38,7 +42,7 @@ enyo.kind({
   didUpdate: function (model) {
     var ch, params = model.changedAttributes();
     ch = params? enyo.keys(params): false;
-    console.log("model.didUpdate", ch, params);
+    //console.log("model.didUpdate", ch, params);
     if (ch && ch.length) {
       this.stopNotifications();
       while (ch.length) {
@@ -53,13 +57,13 @@ enyo.kind({
     this.removeModel();
   },
   
-  removeModel: function () {
-    var m = this.model;
-    if (m) {
+  removeModel: function (model) {
+    var m = model || this.model;
+    if (m && this._updateResponder && this._destroyResponder) {
       m.off("change", this._updateResponder);
       m.off("destroy", this._destroyResponder);
     }
-    this.model = null;
+    if (m === this.model) this.model = null;
   },
   
   destroy: function () {
@@ -77,12 +81,12 @@ enyo.kind({
   },
   
   set: function (inProp, inValue) {
-    if (this.model) {
-      if (inProp in this.model.attributes) {
-        this.model.set(inProp, inValue);
-        return this;
-      }
+    if (this.model && inProp && !enyo.isString(inProp) && (!inValue || (inValue && !enyo.isString(inValue)))) {
+      this.model.set(inProp, inValue);
+    } else if (this.model && inProp in this.model.attributes) {
+      this.model.set(inProp, inValue);
+    } else {
+      return this.inherited(arguments);
     }
-    return this.inherited(arguments);
   }
 });
