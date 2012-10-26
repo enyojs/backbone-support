@@ -69,7 +69,8 @@
     didReset: function (collection, options) {
       //console.log("didReset", this, arguments);
       this.notifyObservers("models", null, this.models);
-      this.notifyObservers("length", null, this.models);
+      this.notifyObservers("length", null, this.length);
+      this.dispatchBubble("onreset");
     },
     
     setupObservers: function () {
