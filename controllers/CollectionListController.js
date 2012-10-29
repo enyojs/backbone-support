@@ -22,9 +22,6 @@ enyo.kind({
   },
   lengthChanged: function () {
     if (!this.owner) return;
-    // FIXME: this is obviously not ok...
-    //if (this.owner.page === 0) this.owner.reset();
-    //else this.owner.refresh();
     this.owner.refresh();
   },
   tapped: function (inSender, inEvent) {
@@ -38,7 +35,6 @@ enyo.kind({
     // TODO: this should be checked for sanity as there was
     // no other obvious way to detect which children should
     // be examined for setup...
-    
     var m = this.collection.at(inEvent.index), c, ch;
 
     // make sure the child view(s) were setup at least once

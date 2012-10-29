@@ -7,17 +7,28 @@ enyo.kind({
     content: null,
     bindProperty: "content"
   },
-  create: function () {
-    this.inherited(arguments);
-    this.initContentBinding();
-  },
+  //create: function () {
+  //  this.inherited(arguments);
+  //  this.initBindings();
+  //},
   
-  initContentBinding: function () {
-    var b = this.get("bindProperty"), s;
-    this.clearBindings();
-    s = "controller." + (b[0] === "."? b.slice(1): b);
-    this.binding({from: s, to: "content"});
-  },
+  //initBindings: function () {
+  //  var b = this.get("bindProperty"), s;
+  //  //this.clearBindings();
+  //  this.binding({from: "controller.length", to: "length", oneWay: true});
+  //  s = "controller." + (b[0] === "."? b.slice(1): b);
+  //  this.binding({from: s, to: "content"});
+  //},
+  
+  //controllerChanged: function () {
+  //  this.inherited(arguments);
+  //  this.initBindings();
+  //},
+  
+  bindings: [
+    {from: "controller.length", to: "length", oneWay: true},
+    {from: "controller.content", to: "content", oneWay: true}
+  ],
   
   initComponents: function () {
     this.rowControl = this.components || this.kindComponents;
@@ -39,14 +50,24 @@ enyo.kind({
     
     for (i = 0; i < len; ++i) {
       if ((ch = this.children[i])) {
+        
+        //console.log("REUSING CH");
+        
         ch.controller.set("model", m[i]);
         //ch.controller.set("owner", ch);
         ch.syncBindings();
         refresh = false;
       } else {
+        
+        //console.log("STARTING FRESH");
+        
         refresh = true;
+        
         ch = this.createComponent(this.rowControl, enyo.CollectionRowProperties);
-        ch.set("controller", getController(ch.controller || ch.controllerClass, m[i]));
+        //console.log("just created component", ch.controller, ch.controllerClass);
+        //ch.set("controller", getController(ch.controller || ch.controllerClass, m[i]));
+        ch.controller.set("model", m[i]);
+        ch._controllerChanged();
       }
       // NOTE: because of Control's overload of _setup
       ch._setup();
@@ -64,13 +85,17 @@ enyo.kind({
     }
   },
   
+  lengthChanged: function (inOld, inNew) {
+    if (inOld) this.contentChanged();
+  },
+  
   contentChanged: function () {
     var c = this.get("content");
     if (!c) return;
     
     // as opposed to before, manually set the length property
     // locally once we know the content has been updated
-    if (this.length !== c.length) this.set("length", c.length);
+    //if (this.length !== c.length) this.set("length", c.length);
     this.render();
   }
 });

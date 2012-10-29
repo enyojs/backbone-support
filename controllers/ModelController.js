@@ -13,6 +13,11 @@ enyo.kind({
   constructor: function (inProps) {
     if (inProps) this.model = inProps.model;
     this.inherited(arguments);
+    
+    if (!enyo.modelControllerCount) enyo.modelControllerCount = 1;
+    else enyo.modelControllerCount++;
+    
+    //console.log("created an enyo.ModelController", enyo.modelControllerCount);
   },
   
   create: function () {
@@ -69,6 +74,8 @@ enyo.kind({
   destroy: function () {
     this.removeModel();
     this.inherited(arguments);
+    enyo.modelControllerCount--;
+    //console.log("just destroyed a model controller");
   },
   
   get: function () {
@@ -82,8 +89,6 @@ enyo.kind({
   
   set: function (inProp, inValue) {
     if (this.model && inProp && !enyo.isString(inProp) && (!inValue || (inValue && !enyo.isString(inValue)))) {
-      this.model.set(inProp, inValue);
-    } else if (this.model && inProp in this.model.attributes) {
       this.model.set(inProp, inValue);
     } else {
       return this.inherited(arguments);

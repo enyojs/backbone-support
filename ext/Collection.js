@@ -64,12 +64,13 @@
     didChange: function (model, options) {
       //console.log("didChange", this, arguments);
       this.notifyObservers("models", null, this.models);
+      this.dispatchBubble("onchange", model);
     },
     
     didReset: function (collection, options) {
       //console.log("didReset", this, arguments);
-      this.notifyObservers("models", null, this.models);
       this.notifyObservers("length", null, this.length);
+      this.notifyObservers("models", null, this.models);
       this.dispatchBubble("onreset");
     },
     
