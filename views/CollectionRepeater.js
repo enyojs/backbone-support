@@ -41,7 +41,7 @@ enyo.kind({
       
     getController = function (controller, model) {
       if (c) return c instanceof enyo.Controller? c.set("model", model): new c({model: model});
-      if (controller && enyo.isString(controller)) c = enyo._getPath(controller);
+      if (controller && enyo.isString(controller)) c = enyo.getPath(controller);
       else if (controller && controller instanceof enyo.Controller) c = controller;
       else if (controller && enyo.isFunction(controller)) c = controller;
       if (!c) c = enyo.ModelController;

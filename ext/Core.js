@@ -31,7 +31,7 @@
     var q = enyo._queue || [], args = enyo.toArray(arguments).slice(2);
     if (!fn) return false;
     if (enyo.isString(fn)) {
-      fn = enyo._getPath.call(context, fn);
+      fn = enyo.getPath.call(context, fn);
       if (!fn) return false;
     }
     if (!enyo.isFunction(fn)) return false;

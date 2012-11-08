@@ -52,7 +52,7 @@
     
     setupStore: function () {
       var s = this.store;
-      if (enyo.isString(s)) s = enyo._getPath(s);
+      if (enyo.isString(s)) s = enyo.getPath(s);
       else return;
       if (!s) return console.warn("enyo.Application: could not " +
         "find the store `" + this.store + "`");
@@ -65,7 +65,7 @@
     
     setupRouter: function () {
       var r = this.router, c = this.controller;
-      if (enyo.isString(r)) r = enyo._getPath(r);
+      if (enyo.isString(r)) r = enyo.getPath(r);
       else return;
       if (!r) return console.warn("enyo.Application: could not " +
         "find the router `" + this.router + "`");

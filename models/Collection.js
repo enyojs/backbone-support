@@ -17,7 +17,7 @@
     
     constructor: function () {
       var ms = this.model, m;
-      if (enyo.isString(ms)) m = enyo._getPath(ms);
+      if (enyo.isString(ms)) m = enyo.getPath(ms);
       if (!m) enyo.error("enyo.Collection: cannot find model " + ms);
       this.model = m;
       this.inherited(arguments);

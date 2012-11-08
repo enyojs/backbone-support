@@ -21,7 +21,7 @@ enyo.kind({
   ],
   collectionChanged: function () {
     var cs = this.get("collection"), c;
-    if (enyo.isString(cs)) c = this.collection = enyo._getPath(cs);
+    if (enyo.isString(cs)) c = this.collection = enyo.getPath(cs);
     else c = this.collection = cs;
     
     // TODO: probably don't want to throw this error...
