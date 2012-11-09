@@ -1,3 +1,12 @@
+/**
+  An adapted _enyo.List_ designed for use with _enyo.Collection_
+  and _enyo.Controller_ natively also providing support for
+  _enyo.Binding_. 
+  
+  It expects its controller to be of kind _enyo.CollectionListController_
+  and can have a collection handed to it or let the controller handle
+  the collection.
+*/
 enyo.kind({
   name: "enyo.CollectionList",
   kind: "enyo.List",
@@ -9,6 +18,7 @@ enyo.kind({
   published: {
     collection: ""
   },
+  //*@protected
   create: function () {
     var cl = this.get("collection"), c;
     this.inherited(arguments);
