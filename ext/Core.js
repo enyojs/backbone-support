@@ -83,4 +83,8 @@
   Backbone.Model = enyo.Model;
   Backbone.Collection = enyo.Collection;
   
+  //*@protected
+  // map enyo.Control to synonymous enyo.View for clarity
+  // between the closely associated but distinct enyo.Controller class
+  enyo.View = enyo.Control;
 }());
