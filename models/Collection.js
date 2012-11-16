@@ -1,9 +1,22 @@
 (function() {
 
+  //*@public
+  /**
+    _enyo.Collection_ is extended from _Backbone.js_'s _Backbone.Collection_.
+    Any of the API from _Backbone.Collection_ is available on _enyo.Collection_
+    plus any of the features of _enyo.Component_ (inherited from _enyo.Extension_).
+    
+    _enyo.CollectionControllers_ properly handle the events and _status_ of
+    _enyo.Collection_.
+  
+    TODO: complete docs...
+  */
   var collection = enyo.kind({
     name: "enyo.Collection",
     kind: "enyo.Extension",
     extendFrom: "enyo.Backbone.Collection",
+    preserve: true,
+    preserveAll: false,
     
     published: {
       status: 0x00

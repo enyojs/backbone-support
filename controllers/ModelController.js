@@ -27,7 +27,6 @@ enyo.kind({
   
   modelChanged: function () {
     var i = 0, attrs, attr, m = this.model, ch = {};
-    
     // if the model doesn't exist or is set to the same
     // model as before do not update anything
     if (!m || this.lastModel.cid === m.cid) return;

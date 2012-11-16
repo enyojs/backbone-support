@@ -26,6 +26,7 @@ enyo.kind({
     
     // TODO: probably don't want to throw this error...
     if (!c) throw new Error("enyo.CollectionController: cannot find collection " + cs);
+    //if (!c) return false;
     if (enyo.isFunction(c)) c = this.collection = new c();
     
     c.owner = this;

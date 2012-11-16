@@ -9,7 +9,6 @@
   // with our enyo.Extensions
   Backbone.Model = enyo.Model;
   Backbone.Collection = enyo.Collection;
-  
   //*@protected
   // map enyo.Control to synonymous enyo.View for clarity
   // between the closely associated but distinct enyo.Controller class

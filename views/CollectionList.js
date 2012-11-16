@@ -26,5 +26,18 @@ enyo.kind({
     
     // let the controller deal with the setup on its own
     if (c && cl) c.set("collection", cl);
-  }
+  },
+  //*@protected
+  initComponents: function () {
+    var names = enyo.pluck("name", this.get("items")), ctrs;
+    this.inherited(arguments);
+    ctrs = enyo.only(names, enyo.indexBy("name", this.controls))
+    enyo.forEach(ctrs, function (ctr) {
+      ctr.extend(enyo.CollectionRowMixin);
+    });
+  },
+  //*@protected
+  items: enyo.Computed(function () {
+    return this.components && this.components.length? this.components: this.kindComponents;
+  })
 });
