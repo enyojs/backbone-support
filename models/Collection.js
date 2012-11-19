@@ -66,25 +66,27 @@
       //console.log("didAdd", this, arguments);
       this.notifyObservers("models", null, this.models);
       this.notifyObservers("length", null, this.length);
+      this.dispatchBubble("oncollectionadd", model);
     },
     
     didRemove: function (model, collection, params) {
       //console.log("didRemove", this, arguments);
       this.notifyObservers("models", null, this.models);
       this.notifyObservers("length", null, this.length);
+      this.dispatchBubble("oncollectionremove", model);
     },
     
     didChange: function (model, options) {
       //console.log("didChange", this, arguments);
       this.notifyObservers("models", null, this.models);
-      this.dispatchBubble("onchange", model);
+      this.dispatchBubble("oncollectionchange", model);
     },
     
     didReset: function (collection, options) {
       //console.log("didReset", this, arguments);
       this.notifyObservers("length", null, this.length);
       this.notifyObservers("models", null, this.models);
-      this.dispatchBubble("onreset");
+      this.dispatchBubble("oncollectionreset");
     },
     
     setupObservers: function () {

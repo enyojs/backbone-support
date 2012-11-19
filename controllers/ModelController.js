@@ -41,12 +41,14 @@ enyo.kind({
     
     // register for destroy notification
     m.on("destroy", (this._destroyResponder = enyo.bind(this, this.didDestroy)));
+    
+    // TODO: is this desirable here?
+    this.owner.refreshBindings();
   },
   
   didUpdate: function (model) {
     var ch, params = model.changedAttributes();
     ch = params? enyo.keys(params): false;
-    //console.log("model.didUpdate", ch, params);
     if (ch && ch.length) {
       this.stopNotifications();
       while (ch.length) {

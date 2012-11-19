@@ -8,8 +8,8 @@ enyo.kind({
   handlers: {
     onSetupItem: "setupItem",
     ontap: "tapped",
-    onreset: "didReset",
-    onchange: "didChange"
+    oncollectionreset: "didReset",
+    oncollectionchange: "didChange"
   },
   ownerChanged: function () {
     this.inherited(arguments);
