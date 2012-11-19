@@ -55,7 +55,8 @@ enyo.kind({
         
         ch.controller.set("model", m[i]);
         //ch.controller.set("owner", ch);
-        ch.syncBindings();
+        //ch.syncBindings();
+        ch.refreshBindings();
         refresh = false;
       } else {
         
@@ -63,11 +64,14 @@ enyo.kind({
         
         refresh = true;
         
-        ch = this.createComponent(this.rowControl, enyo.CollectionRowProperties);
+        ch = this.createComponent(this.rowControl);
+        //console.log(ch, this.rowControl);
+        ch.extend(enyo.CollectionRowMixin);
+        //ch = this.createComponent(this.rowControl, enyo.CollectionRowProperties);
         //console.log("just created component", ch.controller, ch.controllerClass);
         //ch.set("controller", getController(ch.controller || ch.controllerClass, m[i]));
         ch.controller.set("model", m[i]);
-        ch._controllerChanged();
+        //ch.controllerChanged();
       }
       // NOTE: because of Control's overload of _setup
       ch._setup();
