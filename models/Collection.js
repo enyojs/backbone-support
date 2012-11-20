@@ -14,7 +14,7 @@
   var collection = enyo.kind({
     name: "enyo.Collection",
     kind: "enyo.Extension",
-    extendFrom: "enyo.Backbone.Collection",
+    extendFrom: [{base: "enyo.Backbone.Collection", name: "collection"}],
     preserve: true,
     preserveAll: false,
     
