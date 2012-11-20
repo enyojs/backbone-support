@@ -9,9 +9,10 @@
 enyo.kind({
   name: "enyo.Model",
   kind: "enyo.Extension",
-  extendFrom: [{base: "enyo.Backbone.Model", name: "model"}],
-  preserve: true,
-  preserveAll: false,
+  extendFrom: [
+    {base: "enyo.Backbone.Model", name: "model", preserve: true}
+  ],
+  mixins: ["enyo.MultipleDispatchMixin"],
   //*@public
   get: function (prop) {
     // we want to test and see if the model returns a value

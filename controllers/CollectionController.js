@@ -23,12 +23,10 @@ enyo.kind({
     var cs = this.get("collection"), c;
     if (enyo.isString(cs)) c = this.collection = enyo.getPath(cs);
     else c = this.collection = cs;
-    
     // TODO: probably don't want to throw this error...
     if (!c) throw new Error("enyo.CollectionController: cannot find collection " + cs);
     //if (!c) return false;
     if (enyo.isFunction(c)) c = this.collection = new c();
-    
     c.owner = this;
     
     // call refresh as opposed to _setupBindings since that destroys
