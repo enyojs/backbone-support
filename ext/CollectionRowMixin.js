@@ -61,7 +61,9 @@ enyo.Mixin({
     }
   },
   bindableControls: enyo.Computed(function () {
-    return enyo.filter(this.controls, function (ch) {
+    var ctrs = enyo.clone(this.controls);
+    ctrs.unshift(this);
+    return enyo.filter(ctrs, function (ch) {
       return ch.bindProperty;
     });
   })
