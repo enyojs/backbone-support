@@ -6,8 +6,19 @@ enyo.kind({
     autoLoad: false,
     status: null,
     length: 0,
-    content: null,
+    data: null,
     status: enyo.Collection.OK
+  },
+  //*@protected
+  /**
+    In cases where a proxy controller is used, we need to
+    do something out of the ordinary. We want to treat the
+    proxied collection controller as the collection...
+  */
+  initProxyController: function () {
+    var proxy = this.proxyController;
+    this.collection = proxy;
+    this.collectionChanged();
   },
   create: function () {
     this.inherited(arguments);
@@ -15,23 +26,22 @@ enyo.kind({
     if (this.get("autoLoad")) enyo.run(this.load, this);
   },
   bindings: [
-    {from: "collection.length", to: "length"},
-    {from: "collection.models", to: "content"},
-    {from: "collection.status", to: "status", oneWay: true}
+    {from: "collection.length", to: "length", oneWay: false},
+    {from: "collection.models", to: "data", oneWay: false},
+    {from: "collection.status", to: "status"}
   ],
   collectionChanged: function () {
-    var cs = this.get("collection"), c;
-    if (enyo.isString(cs)) c = this.collection = enyo.getPath(cs);
-    else c = this.collection = cs;
-    // TODO: probably don't want to throw this error...
-    if (!c) throw new Error("enyo.CollectionController: cannot find collection " + cs);
-    //if (!c) return false;
-    if (enyo.isFunction(c)) c = this.collection = new c();
-    c.owner = this;
-    
-    // call refresh as opposed to _setupBindings since that destroys
-    // bindings we're relying on, this is a proper use-case for refresh
-    this.refreshBindings();
+    this.findAndInstance("collection", function (ctor, inst) {
+      // if neither we couldn't find it
+      if (!(ctor || inst)) return;
+      // if we have a constructor and an instance we created it
+      // so we can own it
+      if (inst) {
+        inst.addDispatchTarget(this);
+      }
+      // either way lets refresh bindings
+      this.refreshBindings();
+    });
   },
   load: function (options) {
     this.collection.fetch(options);
@@ -47,5 +57,8 @@ enyo.kind({
   },
   remove: function () {
     return this.collection.remove.apply(this.collection, arguments);
+  },
+  at: function () {
+    return this.collection.at.apply(this.collection, arguments);
   }
 });

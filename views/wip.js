@@ -4,8 +4,8 @@ enyo.kind({
   published: {
     controller: null,
     length: null,
-    content: null,
-    bindProperty: "content"
+    data: null,
+    bindProperty: "data"
   },
   //create: function () {
   //  this.inherited(arguments);
@@ -17,7 +17,7 @@ enyo.kind({
   //  //this.clearBindings();
   //  this.binding({from: "controller.length", to: "length", oneWay: true});
   //  s = "controller." + (b[0] === "."? b.slice(1): b);
-  //  this.binding({from: s, to: "content"});
+  //  this.binding({from: s, to: "data"});
   //},
   
   //controllerChanged: function () {
@@ -27,7 +27,7 @@ enyo.kind({
   
   bindings: [
     {from: "controller.length", to: "length", oneWay: true},
-    {from: "controller.content", to: "content", oneWay: true}
+    {from: "controller.data", to: "data", oneWay: true}
   ],
   
   initComponents: function () {
@@ -37,7 +37,7 @@ enyo.kind({
     this.inherited(arguments);
   },
   render: function () {
-    var i = 0, c, ch, m = this.get("content"), len = this.length, getController, refresh = false;
+    var i = 0, c, ch, m = this.get("data"), len = this.length, getController, refresh = false;
       
     getController = function (controller, model) {
       if (c) return c instanceof enyo.Controller? c.set("model", model): new c({model: model});
@@ -90,15 +90,15 @@ enyo.kind({
   },
   
   lengthChanged: function (inOld, inNew) {
-    if (inOld) this.contentChanged();
+    if (inOld) this.dataChanged();
   },
   
-  contentChanged: function () {
-    var c = this.get("content");
+  dataChanged: function () {
+    var c = this.get("data");
     if (!c) return;
     
     // as opposed to before, manually set the length property
-    // locally once we know the content has been updated
+    // locally once we know the data has been updated
     //if (this.length !== c.length) this.set("length", c.length);
     this.render();
   }

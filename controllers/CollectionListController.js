@@ -3,7 +3,7 @@ enyo.kind({
   name: "enyo.CollectionListController",
   kind: "enyo.CollectionController",
   bindings: [
-    {from: "length", to: "owner.count", oneWay: true}
+    {from: "length", to: "owner.count"}
   ],
   handlers: {
     onSetupItem: "setupItem",
@@ -22,7 +22,7 @@ enyo.kind({
     return true;
   },
   lengthChanged: function () {
-    if (!this.owner) return;
+    if (!this.owner || !this.collection) return;
     this.owner.refresh();
   },
   tapped: function (inSender, inEvent) {

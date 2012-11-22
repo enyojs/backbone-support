@@ -10,28 +10,36 @@
 enyo.kind({
   name: "enyo.CollectionList",
   kind: "enyo.List",
-  
-  // NOTE: there's an option here, overload the controller
-  // to know about the collection type, or provide it
-  // to the list and have it hand-it off...
   controller: "enyo.CollectionListController",
-  published: {
-    collection: ""
-  },
-  //*@protected
+  collection: null,
   create: function () {
-    var cl = this.get("collection"), c;
     this.inherited(arguments);
-    c = this.get("controller");
-    
-    // let the controller deal with the setup on its own
-    if (c && cl) c.set("collection", cl);
+    this.collectionChanged();
+  },
+  controllerChanged: function () {
+    var ctrl, tmp;
+    this.inherited(arguments);
+    ctrl = this.controller;
+    if (ctrl && !(ctrl instanceof enyo.CollectionListController)) {
+      tmp = ctrl;
+      ctrl = this.controller = new enyo.CollectionListController();
+      ctrl.set("owner", this);
+      this.collection = tmp;
+    }
+  },
+  collectionChanged: function () {
+    this.findAndInstance("collection", function (ctor, inst) {
+      if (!(ctor || inst)) return;
+      if (ctor || inst !== this.controller.collection) {
+        this.controller.set("collection", inst);
+      }
+    })
   },
   //*@protected
   initComponents: function () {
     var names = enyo.pluck("name", this.get("items")), ctrs;
     this.inherited(arguments);
-    ctrs = enyo.only(names, enyo.indexBy("name", this.controls))
+    ctrs = enyo.only(names, enyo.indexBy("name", this.controls));
     enyo.forEach(ctrs, function (ctr) {
       ctr.extend(enyo.CollectionRowMixin);
     });
