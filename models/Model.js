@@ -12,7 +12,6 @@ enyo.kind({
   extendFrom: [
     {base: "enyo.Backbone.Model", name: "model", preserve: true}
   ],
-  mixins: ["enyo.MultipleDispatchMixin"],
   //*@public
   get: function (prop) {
     // we want to test and see if the model returns a value
@@ -50,5 +49,4 @@ enyo.kind({
     // use the default
     return this.inherited(arguments);
   }
-
 });
