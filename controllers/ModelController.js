@@ -47,7 +47,7 @@ enyo.kind({
   },
   
   didUpdate: function (model) {
-    var ch, params = model.changedAttributes();
+    var ch, params = model.changedAttributes(), c;
     ch = params? enyo.keys(params): false;
     if (ch && ch.length) {
       this.stopNotifications();
