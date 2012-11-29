@@ -9,6 +9,9 @@ enyo.kind({
     data: null,
     status: enyo.Collection.OK
   },
+  handlers: {
+    oncollectionchange: "dataChanged"
+  },
   //*@protected
   /**
     In cases where a proxy controller is used, we need to

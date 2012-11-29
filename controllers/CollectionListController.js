@@ -28,6 +28,7 @@ enyo.kind({
   tapped: function (inSender, inEvent) {
   },
   didChange: function (inCollection, inModel) {
+    var idx = inModel.index;
     this.owner.refresh();
   },
   
