@@ -3,7 +3,8 @@ enyo.kind({
   name: "enyo.CollectionListController",
   kind: "enyo.CollectionController",
   bindings: [
-    {from: "length", to: "owner.count"}
+    {from: "length", to: "owner.count"},
+    {from: "owner.targets", to: "targets"}
   ],
   handlers: {
     onSetupItem: "setupItem",
@@ -51,11 +52,6 @@ enyo.kind({
     }
   },
   getTargets: function () {
-    return enyo.clone(this._targets || (this._targets = this.findTargets()));
-  },
-  findTargets: function () {
-    var o = this.owner, c = enyo.only(enyo.pluck("name", o.get("items")),
-      enyo.indexBy("name", o.$.client.children));
-    return c;
+    return enyo.clone(this.targets);
   }
 });
