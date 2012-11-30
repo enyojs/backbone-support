@@ -63,8 +63,15 @@ enyo.Mixin({
   bindableControls: enyo.Computed(function () {
     var ctrs = enyo.clone(this.controls);
     ctrs.unshift(this);
-    return enyo.filter(ctrs, function (ch) {
-      return ch.bindProperty;
+    return this.findBindableControls(ctrs);
+  }),
+  findBindableControls: function (controls) {
+    if (!controls || controls.length === 0) return controls;
+    var ret = [], fn = enyo.bind(this, this.findBindableControls);
+    enyo.forEach(controls, function (control) {
+      ret = ret.concat(fn(control.controls || []));
+      if (control.bindProperty) ret.push(control);
     });
-  })
+    return ret;
+  }
 });
