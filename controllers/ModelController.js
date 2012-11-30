@@ -41,9 +41,8 @@ enyo.kind({
     
     // register for destroy notification
     m.on("destroy", (this._destroyResponder = enyo.bind(this, this.didDestroy)));
-    
-    // TODO: is this desirable here?
-    this.owner.refreshBindings();
+    // TODO: is there a time/way this should be disabled?
+    this.notifyAll();
   },
   
   didUpdate: function (model) {
@@ -94,5 +93,11 @@ enyo.kind({
     } else {
       return this.inherited(arguments);
     }
+  },
+  
+  notifyAll: function () {
+    var targets = this.get("dispatchTargets");
+    if (this.owner && -1 === targets.indexOf(this.owner)) targets.push(this.owner);
+    enyo.forEach(targets, function (target) {target.refreshBindings()});
   }
 });
