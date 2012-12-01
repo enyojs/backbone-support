@@ -72,5 +72,8 @@ enyo.kind({
   },
   at: function () {
     return this.collection.at.apply(this.collection, arguments);
+  },
+  indexOf: function () {
+    return this.collection.indexOf.apply(this.collection, arguments);
   }
 });
