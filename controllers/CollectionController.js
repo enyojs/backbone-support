@@ -10,7 +10,12 @@ enyo.kind({
     status: enyo.Collection.OK
   },
   handlers: {
-    oncollectionchange: "dataChanged"
+    // this maps a specific change event and the model that
+    // was changed to a responder, any subclass of this controller
+    // can simply have a modelChanged function and expect that the
+    // model is the one that changed, this is not the same as
+    // collectionChanged or dataChanged or modelsChanged...
+    oncollectionchange: "modelChanged"
   },
   //*@protected
   /**
@@ -31,7 +36,10 @@ enyo.kind({
   bindings: [
     {from: "collection.length", to: "length", oneWay: false},
     {from: "collection.models", to: "data", oneWay: false},
-    {from: "collection.status", to: "status"}
+    {from: "collection.status", to: "status"},
+    // we do this because other controllers may treat this controller
+    // as if it were a collection (intended use-case)
+    {from: "collection.models", to: "models", oneWay: false}
   ],
   collectionChanged: function () {
     this.findAndInstance("collection", function (ctor, inst) {

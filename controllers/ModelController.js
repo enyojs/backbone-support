@@ -87,12 +87,17 @@ enyo.kind({
     return this.inherited(arguments);
   },
   
-  set: function (inProp, inValue) {
-    if (this.model && inProp && !enyo.isString(inProp) && (!inValue || (inValue && !enyo.isString(inValue)))) {
-      this.model.set(inProp, inValue);
-    } else {
-      return this.inherited(arguments);
+  set: function (key, value) {
+    // if the key is either a hash or included as an attribute of the model
+    // then we assume it is a request to set it on the model
+    if (this.model) {
+      if ("string" !== typeof key || key in this.model.attributes) {
+        // even though the api is different for each possibility the outcome
+        // will be the same...
+        return this.model.set(key, value);
+      }
     }
+    return this.inherited(arguments);
   },
   
   notifyAll: function () {

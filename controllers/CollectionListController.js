@@ -9,8 +9,7 @@ enyo.kind({
   handlers: {
     onSetupItem: "setupItem",
     ontap: "tapped",
-    oncollectionreset: "didReset",
-    oncollectionchange: "didChange"
+    oncollectionreset: "didReset"
   },
   ownerChanged: function () {
     this.inherited(arguments);
@@ -28,11 +27,11 @@ enyo.kind({
   },
   tapped: function (inSender, inEvent) {
   },
-  didChange: function (inCollection, inModel) {
-    var idx = inModel.index;
-    this.owner.refresh();
+  modelChanged: function (inCollection, inModel) {
+    var idx, data = this.data;
+    idx = data.indexOf(inModel);
+    this.owner.renderRow(idx);
   },
-  
   // NOTE: unlike enyo.List/enyo.FlyweightRepeater where the
   // onSetupItem typically is interested in modifying the view
   // an enyo.CollectionList's onSetupItem is interested in the
@@ -50,6 +49,7 @@ enyo.kind({
       ch.controller.set("model", m);
       ch.refreshBindings();
     }
+    return true;
   },
   getTargets: function () {
     return enyo.clone(this.targets);

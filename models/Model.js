@@ -22,7 +22,7 @@ enyo.kind({
     // verify (this covers probably 90%+ of cases) that the
     // requested attribute isn't a known attribute that properly
     // returned a null
-    if (r) {
+    if (r !== undefined) {
       return r;
     } else if (r === null) {
       if ((prop in this.attributes) && this.attributes[prop] === null)
