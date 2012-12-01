@@ -15,7 +15,8 @@ enyo.kind({
     // can simply have a modelChanged function and expect that the
     // model is the one that changed, this is not the same as
     // collectionChanged or dataChanged or modelsChanged...
-    oncollectionchange: "modelChanged"
+    oncollectionchange: "modelChanged",
+    oncollectionadd: "modelAdded"
   },
   //*@protected
   /**
