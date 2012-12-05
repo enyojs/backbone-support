@@ -14,6 +14,11 @@ enyo.Mixin({
       var p = ch.bindProperty, t = this.getBindTargetFor(ch);
       this.autoBinding({source: c, from: p, target: ch, to: t});
     }, this);
+    this.autoBinding({source: c, from: "selected", target: this, to: "selected"});
+  },
+  //*@protected
+  selectedChanged: function () {
+      this.addRemoveClass("selected", this.selected);
   },
   //*@protected
   initMixin: function () {

@@ -9,6 +9,7 @@ enyo.kind({
     data: null,
     status: enyo.Collection.OK
   },
+  mixins: ["enyo.SelectionSupportMixin"],
   handlers: {
     // this maps a specific change event and the model that
     // was changed to a responder, any subclass of this controller

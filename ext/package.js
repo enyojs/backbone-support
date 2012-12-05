@@ -1,5 +1,6 @@
 enyo.depends(
   "Core.js",
   "Store.js",
-  "CollectionRowMixin.js"
+  "CollectionRowMixin.js",
+  "SelectionSupportMixin.js"
 );

@@ -9,7 +9,8 @@ enyo.kind({
   handlers: {
     onSetupItem: "setupItem",
     ontap: "tapped",
-    oncollectionreset: "didReset"
+    oncollectionreset: "didReset",
+    onSelect: "setSelected"
   },
   ownerChanged: function () {
     this.inherited(arguments);
@@ -53,5 +54,27 @@ enyo.kind({
   },
   getTargets: function () {
     return enyo.clone(this.targets);
+  },
+  
+  decorateEvent: function (name, event, sender) {
+      // if the event has the index property we assume
+      // it is associated with a row and we will, for now,
+      // add a property `model` that can be used by handlers
+      if (!isNaN(event.index)) {
+          var model = this.at(event.index);
+          if (model) event.model = model;
+          else event.model = null;
+      }
+  },
+  
+  setSelected: function (sender, event) {
+      var model = event.model;
+      if (!model) return;
+      model.set("selected", true);
+      if (this.previouslySelected) {
+          this.previouslySelected.set("selected", false);
+      }
+      this.previouslySelected = model;
   }
+  
 });
