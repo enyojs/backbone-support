@@ -24,7 +24,7 @@ enyo.kind({
     extendFrom: [
         {base: "enyo.Backbone.Collection", name: "collection"}
     ],
-    mixins: ["enyo.MultupleDispatchMixin"],
+    mixins: ["enyo.MultipleDispatchMixin"],
     // this forces the extension to store common methods for the base
     // class (in this case enyo.Backbone.Collection) via the _stored_
     // object property
@@ -69,16 +69,20 @@ enyo.kind({
                         this.model = this.owner.owner.model;
                     }
                 }
+                // well lets make sure we found a model somewhere
+                if (!this.model) {
+                    enyo.warn("enyo.Collection: cannot find a model kind " +
+                        "defined on the collection, controller or owner view " +
+                        "defaulting to enyo.Model");
+                    this.model = "enyo.Model";
+                }
+                // start over now that we know we have something
+                return this.modelChanged();
             }
-            // well lets make sure we found a model somewhere
-            if (!this.model) {
-                enyo.warn("enyo.Collection: cannot find a model kind " +
-                    "defined on the collection, controller or owner view " +
-                    "defaulting to enyo.Model");
-                this.model = "enyo.Model";
-            }
-            // start over now that we know we have something
-            return this.modelChanged();
+            // we can't do anything until we have an owner or our
+            // model property is set -- this is a perfectly ok state
+            // to be
+            return;
         }
         if ("string" === typeof model) {
             model = this.model = enyo.getPath(model);
@@ -207,5 +211,13 @@ enyo.kind({
             this.off(responder, observers[responder]);
         }
         this.inherited(arguments);
+    },
+    /**
+        If the owner changed we want to make sure we have a model defined
+        and if not go ahead and recheck for one.
+    */
+    ownerChanged: function () {
+        if (!this.model) this.modelChanged();
+        return this.inherited(arguments);
     }
 })

@@ -53,6 +53,7 @@ enyo.kind({
         for events on individual models.
     */
     modelChanged: function (collection, model) {
+        this.log(model);
         // TODO: models should already know their index
         // in the collection
         var idx = this.indexOf(model);
@@ -128,7 +129,6 @@ enyo.kind({
         }
         model.set({selected: true});
         this.previouslySelected = model;
-        this.owner.prepareRow(this.indexOf(model));
     },
     /**
         Will automatically prepare the row for interactivity

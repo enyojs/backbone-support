@@ -27,6 +27,12 @@ enyo.kind({
         to use.
     */
     collection: null,
+    /**
+        If the collection that is used for this list does not have
+        a model kind defined you can set this property as if it were
+        on the collection.
+    */
+    model: null,
     //*@protected
     /** 
         Overloaded controllerChanged to handle the various
