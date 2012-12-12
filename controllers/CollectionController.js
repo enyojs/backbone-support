@@ -46,7 +46,18 @@ enyo.kind({
   collectionChanged: function () {
     this.findAndInstance("collection", function (ctor, inst) {
       // if neither we couldn't find it
-      if (!(ctor || inst)) return;
+      if (!(ctor || inst)) {
+          // check to see if we have an owner and if so if the collection
+          // was set there
+          if (this.owner) {
+              if (this.owner.collection) {
+                  this.collection = this.owner.collection;
+                  return this.collectionChanged();
+              }
+          }
+          this.collection = "enyo.Collection";
+          return this.collectionChanged();
+      }
       // if we have a constructor and an instance we created it
       // so we can own it
       if (inst) {

@@ -1,65 +1,122 @@
+
+//*@public
 /**
-  An adapted _enyo.List_ designed for use with _enyo.Collection_
-  and _enyo.Controller_ natively also providing support for
-  _enyo.Binding_. 
-  
-  It expects its controller to be of kind _enyo.CollectionListController_
-  and can have a collection handed to it or let the controller handle
-  the collection.
 */
 enyo.kind({
-  name: "enyo.CollectionList",
-  kind: "enyo.List",
-  controller: "enyo.CollectionListController",
-  collection: null,
-  create: function () {
-    this.inherited(arguments);
-    this.collectionChanged();
-  },
-  controllerChanged: function () {
-    var ctrl, tmp;
-    this.inherited(arguments);
-    ctrl = this.controller;
-    if (ctrl && !(ctrl instanceof enyo.CollectionListController)) {
-      tmp = ctrl;
-      ctrl = this.controller = new enyo.CollectionListController();
-      ctrl.set("owner", this);
-      this.collection = tmp;
-    }
-  },
-  collectionChanged: function () {
-    this.findAndInstance("collection", function (ctor, inst) {
-      if (!(ctor || inst)) return;
-      if (ctor || inst !== this.controller.collection) {
-        this.controller.set("collection", inst);
-      }
+    //*@protected
+    name: "enyo.CollectionList",
+    kind: "enyo.List",
+    //*@public
+    /**
+        The default expected controller _kind_ for
+        enyo.CollectionList is the enyo.CollectionListController.
+        There are plenty of scenarios though where you might
+        want to share content already being proxied from another
+        enyo.CollectionController or enyo.Collection itself. You
+        can set this property to point to any subclass of
+        enyo.CollectionController and the list will automatically
+        figure out what it needs to do.
+    */
+    controller: "enyo.CollectionListController",
+    /**
+        You can provide an enyo.Collection _kind_ and it will be
+        used with your given controller _as long as the controller
+        does not have another _collection_ defined. This is a fallback
+        but allows for a custom list to be thrown up without having
+        to subclass the controller to know what kind of _collection_
+        to use.
+    */
+    collection: null,
+    //*@protected
+    /** 
+        Overloaded controllerChanged to handle the various
+        scenarios that can arise from the various ways this
+        particular _kind_ can be created.
+    */
+    controllerChanged: function () {
+        this.findAndInstance("controller", function (ctor, inst) {
+            var other;
+            // if we don't have an instance that means there was
+            // an attempt to use a subclass that could not be found
+            if (!(ctor || inst)) {
+                return enyo.error("enyo.CollectionList: request for " +
+                    this.controllerName + " but it could not be found");
+            }
+            // we allow other types of collection controllers to be
+            // assigned here, but we do need to figure out what kind
+            // we have
+            if (!(inst instanceof enyo.CollectionListController)) {
+                // great but we need that kind so we'll go ahead
+                // and create it
+                other = inst;
+                ctor = enyo.CollectionListController;
+                inst = this.controller = new ctor();
+                inst.set("owner", this);
+            } else {
+                // ok it was so lets make sure its owner is set to us
+                inst.set("owner", this);
+            }
+            if (other) {
+                // we need to figure out if the other controller is either
+                // a collection controller or collection, either one will
+                // be useable
+                if ((other instanceof enyo.CollectionController) ||
+                    (other instanceof enyo.Collection)) {    
+                    // ok we will assign our collection property to this
+                    // instance and let the controller choose it as its
+                    // option
+                    this.collection = other;
+                } else {
+                    // this is a problem because we don't know what we can
+                    // do with this object that was handed to us
+                    return enyo.error("enyo.CollectionList: unknown kind used " +
+                        "as controller or collection type, must subclass " +
+                        "enyo.Collection or enyo.CollectionController");
+                }
+            }
+        });
+    },
+    /**
+        We need to initialize our components in the normal way
+        with some slightly added behavior. We have to make sure
+        we can find the original components that our controller
+        will need regardless of whether we were subclassed or
+        inlined in an components block.
+    */
+    initComponents: function () {
+        // use our computed property to get the correct original
+        // pre-instanced components
+        var items = this.get("items");
+        // placeholder for the array of items we're going to need
+        // again to map to our target children
+        var ctrls = [];
+        // make sure to map each entry with a unique identifier
+        enyo.forEach(items, function (item) {
+            item._listId = enyo.uid("_list");
+            // keep track of these id's for later
+            ctrls.push(item._listId);
+        });
+        // lets do our normal setup now
+        this.inherited(arguments);
+        // lets remap our newly instanced children
+        ctrls = enyo.only(ctrls, enyo.indexBy("_listId", this.controls));
+        // we need to make sure to apply the needed mixin properties
+        // to each of these rows so that auto bindings can work
+        enyo.forEach(ctrls, function (ctrl) {
+           // apply the mixin using the instance extend method
+           ctrl.extend(enyo.CollectionRowMixin); 
+        });
+        // now that they are ready we store those so the controller
+        // can use them
+        this.set("targets", ctrls);
+    },
+    /**
+        The computed property that will accurately return the components
+        as were defined either in an inlined collection list or a
+        subclass with children bearing isChrome: true.
+    */
+    items: enyo.Computed(function () {
+        return this.components && this.components.length?
+            this.components: this.kindComponents;
     })
-  },
-  //*@protected
-  initComponents: function () {
-    // grab the correct items, these are uninstanced control definitions
-    // we have no idea what information they contain only that we need
-    // to be able to find them once they are created
-    var items = this.get("items"), ctrs = [];
-    // create a unique id for each of them that we can use to find later
-    enyo.forEach(items, function (item) {
-      item._listId = enyo.uid("_list");
-      ctrs.push(item._listId);
-    });
-    // do the normal routine and assume children are being created
-    this.inherited(arguments);
-    // take the ids we created before and look through the references to
-    // controls we created and only select those
-    ctrs = enyo.only(ctrs, enyo.indexBy("_listId", this.controls));
-    enyo.forEach(ctrs, function (ctr) {
-      // apply the required functionality we need (mixin) to each of
-      // these controls
-      ctr.extend(enyo.CollectionRowMixin);
-    });
-    this.set("targets", ctrs);
-  },
-  //*@protected
-  items: enyo.Computed(function () {
-    return this.components && this.components.length? this.components: this.kindComponents;
-  })
 });
