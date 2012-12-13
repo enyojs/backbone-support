@@ -70,7 +70,7 @@ enyo.kind({
                     // ok we will assign our collection property to this
                     // instance and let the controller choose it as its
                     // option
-                    this.collection = other;
+                    inst.set("collection", other);
                 } else {
                     // this is a problem because we don't know what we can
                     // do with this object that was handed to us
