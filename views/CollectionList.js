@@ -96,22 +96,24 @@ enyo.kind({
         // placeholder for the array of items we're going to need
         // again to map to our target children
         var ctrls = [];
+        // reused variable for mixins in each item
+        var mixins;
         // make sure to map each entry with a unique identifier
+        // and that they know to use the correct mixin type
         enyo.forEach(items, function (item) {
             item._listId = enyo.uid("_list");
             // keep track of these id's for later
             ctrls.push(item._listId);
+            // if there are other mixins we preserve them
+            // usually not the case but just making sure
+            mixins = item.mixins || [];
+            mixins.push("enyo.CollectionRowMixin");
+            item.mixins = mixins;
         });
         // lets do our normal setup now
         this.inherited(arguments);
         // lets remap our newly instanced children
         ctrls = enyo.only(ctrls, enyo.indexBy("_listId", this.controls));
-        // we need to make sure to apply the needed mixin properties
-        // to each of these rows so that auto bindings can work
-        enyo.forEach(ctrls, function (ctrl) {
-           // apply the mixin using the instance extend method
-           ctrl.extend(enyo.CollectionRowMixin); 
-        });
         // now that they are ready we store those so the controller
         // can use them
         this.set("targets", ctrls);
