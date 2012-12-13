@@ -3,7 +3,6 @@
 /**
 */
 enyo.kind({
-    //*@protected
     name: "enyo.CollectionList",
     kind: "enyo.List",
     //*@public
