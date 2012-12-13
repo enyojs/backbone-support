@@ -27,8 +27,8 @@ enyo.kind({
     handlers: {
         // list related events
         onSetupItem: "setupItem",
-        onSelect: "setSelected",
-        ontap: "tapped",
+        // from the row controller
+        onpreparerow: "prepareRow",
         // collection related events
         oncollectionreset: "didReset"
     },
@@ -53,7 +53,7 @@ enyo.kind({
         for events on individual models.
     */
     modelChanged: function (collection, model) {
-        this.log(model);
+        this.log("56", model.changedAttributes());
         // TODO: models should already know their index
         // in the collection
         var idx = this.indexOf(model);
@@ -108,49 +108,59 @@ enyo.kind({
         }
     },
     /**
-        This method attempts to keep the selected state of the
-        the current row up to date. This must happen before the
-        tapped event is handled! Ordering of exection in this
-        function is imperative.
-        
-        NOTE: This may force a render of these rows and this is
-        why it must occur before the tapped event is handled.
+        Will automatically prepare the row for interactivity
+        and ensure that the previously interactive row is
+        locked such that events can propagate as expected in
+        the _view_ and fields will be usable as expected. It
+        can also accept a single Integer parameter instead of
+        the event responder _sender_ and _event_.
     */
-    setSelected: function (sender, event) {
-        this.log(event.index, event.model.cid);
-        // the model for the event coming in
-        var model = event.model;
-        // if for some reason there isn't one we have
-        // nothing to do really
-        if (!model) return;
-        if (this.previouslySelected) {
-            this.previouslySelected.set({selected: false});
-            this.owner.lockRow(this.indexOf(this.previouslySelected));
-        }
-        model.set({selected: true});
-        this.previouslySelected = model;
+    prepareRow: function (sender, event) {
+        // the index we're going to be looking at
+        var idx;
+        // a reference to the model at the index
+        var model;
+        // remember we have to handle the possible scenario
+        // that this method was used like the lists own
+        // prepareRow method
+        if ("number" === typeof sender) idx = sender;
+        // must be a normal event call
+        else idx = event.index;
+        // grab the model at that index
+        model = this.at(idx);
+        // if there is not a model go ahead and do nothing
+        if (!model) return false;
+        // deselect any previously selected model but note
+        // we pass in a reference to the soon-to-be selected
+        // model for comparative purposes, we won't change the
+        // selected state of the model if its attempting to
+        // be selected again
+        this.deselect(model);
+        // select it if possible
+        this.select(model);
+        if (this.owner) this.owner.prepareRow(idx);
+        return true;
     },
     /**
-        Will automatically prepare the row for interactivity
-        and ensure that the previously interactice row is
-        locked such that events can propagate as expected in
-        the _view_ and fields will be usable as expected.
+        Attempt to deselect any previously selected model in
+        the collection unless the model is the same as the soon-
+        to-be selected model.
     */
-    tapped: function (sender, event) {
-        this.log(event.index);
-        // the index of the previously prepared row
-        var prev = this.previouslyPreparedIndex;
-        // the current index for the row that needs to
-        // be prepared
-        var idx = event.index;
-        // if they are the same do nothing
-        if (prev === idx) return;
-        // if they aren't we need to lock the previously
-        // prepared row
-        if (!isNaN(prev)) this.owner.lockRow(prev);
-        // now prepare the current index
-        this.owner.prepareRow(idx);
-        // set our previously prepared index to the new index
-        this.previouslyPreparedIndex = idx;
+    deselect: function (model) {
+        var prev = this.previouslySelected;
+        if (prev && prev !== model) {
+            prev.set("selected", false);
+            if (this.owner) this.owner.lockRow(this.indexOf(prev));
+        }
+    },
+    /**
+        If the model is not already selected, set its selected
+        state to true.
+    */
+    select: function (model) {
+        if (model && !model.get("selected")) {
+            model.set("selected", true);
+            this.previouslySelected = model;
+        }
     }
 });
