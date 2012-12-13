@@ -151,9 +151,9 @@ enyo.kind({
         for the _oncollectionadd_ event.
     */
     didAdd: function (model, collection, params) {
-        this.dispatchBubble("oncollectionadd", model);
         this.notifyObservers("models", null, this.models);
         this.notifyObservers("length", null, this.length);
+        this.dispatchBubble("oncollectionadd", model);
     },
     /**
         When a model is removed from the collection this method
@@ -161,9 +161,9 @@ enyo.kind({
         _oncollectionremove_ event.
     */
     didRemove: function (model, collection, params) {
-        this.dispatchBubble("oncollectionremove", model);
         this.notifyObservers("models", null, this.models);
         this.notifyObservers("length", null, this.length);
+        this.dispatchBubble("oncollectionremove", model);
     },
     /**
         Whenever an individual record emits the _changed_ event
@@ -171,8 +171,8 @@ enyo.kind({
         Will bubble the _oncollectionchange_ event.
     */
     didChange: function (model, params) {
-        this.dispatchBubble("oncollectionchange", model);
         this.notifyObservers("models", null, this.models);
+        this.dispatchBubble("oncollectionchange", model);
     },
     /**
         Whenever the _reset_ method is called on the collection
@@ -182,9 +182,9 @@ enyo.kind({
         collection and replaces all of them at once.
     */
     didReset: function (collection, params) {
-        this.dispatchBubble("oncollectionreset");
         this.notifyObservers("length", null, this.length);
         this.notifyObservers("models", null, this.models);
+        this.dispatchBubble("oncollectionreset", {});
     },
     /**
         This method is responsible for properly registering observers
