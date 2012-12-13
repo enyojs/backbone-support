@@ -95,7 +95,7 @@ enyo.kind({
         var items = this.get("items");
         // placeholder for the array of items we're going to need
         // again to map to our target children
-        var ctrls = [];
+        var controls = [];
         // reused variable for mixins in each item
         var mixins;
         // make sure to map each entry with a unique identifier
@@ -103,7 +103,7 @@ enyo.kind({
         enyo.forEach(items, function (item) {
             item._listId = enyo.uid("_list");
             // keep track of these id's for later
-            ctrls.push(item._listId);
+            controls.push(item._listId);
             // if there are other mixins we preserve them
             // usually not the case but just making sure
             mixins = item.mixins || [];
@@ -113,10 +113,10 @@ enyo.kind({
         // lets do our normal setup now
         this.inherited(arguments);
         // lets remap our newly instanced children
-        ctrls = enyo.only(ctrls, enyo.indexBy("_listId", this.controls));
+        controls = enyo.only(controls, enyo.indexBy("_listId", this.controls));
         // now that they are ready we store those so the controller
         // can use them
-        this.set("targets", ctrls);
+        this.set("targets", controls);
     },
     /**
         The computed property that will accurately return the components
