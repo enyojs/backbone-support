@@ -19,7 +19,8 @@ enyo.Mixin({
     initMixin: function () {
         if (!this.controller) {
             this.set("controller", "enyo.ModelController");
-        } else this.initAutoBindings();
+        }
+        this.controllerChanged();
     },
     // clean up all the auto bindings when the view is destroyed
     destroyMixin: function () {
