@@ -25,11 +25,14 @@ enyo.Mixin({
     // ok part is it is handled automatically now, the bad part is it
     // cannot be overridden easily
     tapped: function (sender, event) {
+        var model = this.model;
+        var idx = model.collection.indexOf(model);
         // without making this too hairy we go ahead and bubble another
         // synchronous event up to the list's controller to make sure
         // we prepare the correct row and it will also handle making sure
         // any other active row is locked first
-        this.bubbleUp("onpreparerow", {index: event.index}, this);
+        this.bubbleUp("onpreparerow", {index: "number" === typeof event.index?
+            event.index: idx}, this);
         return true;
     }
 });

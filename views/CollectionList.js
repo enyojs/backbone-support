@@ -5,6 +5,10 @@
 enyo.kind({
     name: "enyo.CollectionList",
     kind: "enyo.List",
+    // support for multiselection
+    multiselect: false,
+    //@protected
+    mixins: ["enyo.CommonCollectionViewMixin"],
     //*@public
     /**
         The default expected controller _kind_ for
@@ -32,55 +36,6 @@ enyo.kind({
         on the collection.
     */
     model: null,
-    //*@protected
-    /** 
-        Overloaded controllerChanged to handle the various
-        scenarios that can arise from the various ways this
-        particular _kind_ can be created.
-    */
-    controllerChanged: function () {
-        this.findAndInstance("controller", function (ctor, inst) {
-            var other;
-            // if we don't have an instance that means there was
-            // an attempt to use a subclass that could not be found
-            if (!(ctor || inst)) {
-                return enyo.error("enyo.CollectionList: request for " +
-                    this.controllerName + " but it could not be found");
-            }
-            // we allow other types of collection controllers to be
-            // assigned here, but we do need to figure out what kind
-            // we have
-            if (!(inst instanceof enyo.CollectionListController)) {
-                // great but we need that kind so we'll go ahead
-                // and create it
-                other = inst;
-                ctor = enyo.CollectionListController;
-                inst = this.controller = new ctor();
-                inst.set("owner", this);
-            } else {
-                // ok it was so lets make sure its owner is set to us
-                inst.set("owner", this);
-            }
-            if (other) {
-                // we need to figure out if the other controller is either
-                // a collection controller or collection, either one will
-                // be useable
-                if ((other instanceof enyo.CollectionController) ||
-                    (other instanceof enyo.Collection)) {    
-                    // ok we will assign our collection property to this
-                    // instance and let the controller choose it as its
-                    // option
-                    inst.set("collection", other);
-                } else {
-                    // this is a problem because we don't know what we can
-                    // do with this object that was handed to us
-                    return enyo.error("enyo.CollectionList: unknown kind used " +
-                        "as controller or collection type, must subclass " +
-                        "enyo.Collection or enyo.CollectionController");
-                }
-            }
-        });
-    },
     /**
         We need to initialize our components in the normal way
         with some slightly added behavior. We have to make sure
@@ -116,14 +71,5 @@ enyo.kind({
         // now that they are ready we store those so the controller
         // can use them
         this.set("targets", controls);
-    },
-    /**
-        The computed property that will accurately return the components
-        as were defined either in an inlined collection list or a
-        subclass with children bearing isChrome: true.
-    */
-    items: enyo.Computed(function () {
-        return this.components && this.components.length?
-            this.components: this.kindComponents;
-    })
+    }
 });

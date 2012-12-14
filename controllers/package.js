@@ -1,5 +1,6 @@
 enyo.depends(
   "CollectionController.js",
   "ModelController.js",
-  "CollectionListController.js"
+  "CollectionListController.js",
+  "CollectionRepeaterController.js"
 );
