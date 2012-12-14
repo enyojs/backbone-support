@@ -21,7 +21,7 @@ enyo.Mixin({
         Determines and returns the correct string representation
         of the required collection from the base kind.
     */
-    controllerKindName: enyo.Computed(function () {
+    controllerKind: enyo.Computed(function () {
         return enyo.getPath(this.ctor.prototype.controller);
     }),
     /** 
@@ -32,7 +32,7 @@ enyo.Mixin({
     controllerChanged: function () {
         this.findAndInstance("controller", function (ctor, inst) {
             var other;
-            var defaultKind = this.get("controllerKindName");
+            var defaultKind = this.get("controllerKind");
             var kindName = this.kindName;
             var controllerName = this.controllerName;
             // if we don't have an instance that means there was

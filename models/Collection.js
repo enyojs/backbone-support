@@ -55,7 +55,7 @@ enyo.kind({
     modelChanged: function () {
         var model = this.model;
         // if we don't have a model, check our owner first
-        if (!model) {
+        if (!model || this.model === enyo.Backbone.Model) {
             if (this.owner) {
                 if (this.owner.model) {
                     // ok, our owner has the model kind lets use that
@@ -228,7 +228,7 @@ enyo.kind({
         and if not go ahead and recheck for one.
     */
     ownerChanged: function () {
-        if (!this.model) this.modelChanged();
+        this.modelChanged();
         return this.inherited(arguments);
     }
 })

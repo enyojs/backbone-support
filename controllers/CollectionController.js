@@ -162,7 +162,11 @@ enyo.kind({
         If the owner is changed we need to update accordingly.
     */
     ownerChanged: function () {
-        if (!this.collection) this.collectionChanged();
+        if ("object" !== typeof this.collection) this.collectionChanged();
+        if (this.collection && !this.collection.model && this.model) {
+            console.log("YES!", this.model, this.collection);
+            this.collection.set("model", this.model);
+        }
         return this.inherited(arguments);
     }
 })
