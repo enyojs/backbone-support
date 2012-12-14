@@ -21,8 +21,6 @@ enyo.kind({
     // this stores the index of the previously active row
     // in the list
     previouslyPreparedIndex: null,
-    // mixins
-    mixins: ["enyo.SelectionSupportMixin"],
     handlers: {
         // list related events
         onSetupItem: "setupItem",
@@ -51,8 +49,8 @@ enyo.kind({
         This is a named handler coming from the collection
         for events on individual models.
     */
-    modelChanged: function (collection, model) {
-        this.log("56", model.changedAttributes());
+    modelChanged: function (collection, event) {
+        var model = event.model;
         // TODO: models should already know their index
         // in the collection
         var idx = this.indexOf(model);
@@ -130,7 +128,7 @@ enyo.kind({
         // if there was a previously prepared row we need
         // to lock it
         if ("number" === typeof prev) {
-            this.deselect(prev);
+            this.deselect();
             if (view) view.lockRow(prev);
         }
         if (view) {

@@ -153,7 +153,7 @@ enyo.kind({
     didAdd: function (model, collection, params) {
         this.notifyObservers("models", null, this.models);
         this.notifyObservers("length", null, this.length);
-        this.dispatchBubble("oncollectionadd", model);
+        this.dispatchBubble("oncollectionadd", {model: model});
     },
     /**
         When a model is removed from the collection this method
@@ -163,7 +163,7 @@ enyo.kind({
     didRemove: function (model, collection, params) {
         this.notifyObservers("models", null, this.models);
         this.notifyObservers("length", null, this.length);
-        this.dispatchBubble("oncollectionremove", model);
+        this.dispatchBubble("oncollectionremove", {model: model});
     },
     /**
         Whenever an individual record emits the _changed_ event
@@ -171,8 +171,19 @@ enyo.kind({
         Will bubble the _oncollectionchange_ event.
     */
     didChange: function (model, params) {
+        var changed = model.changedAttributes();
+        var prop;
+        var eventName;
         this.notifyObservers("models", null, this.models);
-        this.dispatchBubble("oncollectionchange", model);
+        this.dispatchBubble("oncollectionchange", {model: model});
+        // lets go a step further and emit a specific event
+        // that can be listened for related to the attributes
+        // that changed
+        for (prop in changed) {
+            if (!changed.hasOwnProperty(prop)) continue;
+            eventName = enyo.format("on%.Changed", enyo.cap(prop));
+            this.dispatchBubble(eventName, {model: model, value: changed[prop]});
+        }
     },
     /**
         Whenever the _reset_ method is called on the collection

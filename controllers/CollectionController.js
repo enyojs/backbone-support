@@ -35,6 +35,8 @@ enyo.kind({
         models: null
     },
     //*@protected
+    mixins: ["enyo.SelectionSupportMixin"],
+    //*@protected
     handlers: {
         // these are automatic handlers for these events that are
         // bubbled by the underlying collection, an owner of this

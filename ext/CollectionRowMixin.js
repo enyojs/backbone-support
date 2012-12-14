@@ -60,7 +60,6 @@ enyo.Mixin({
     // wishes they can supply the appropriate CSS to display
     // the row differently
     selectedChanged: function () {
-        console.log("selectedChanged: yo", this.selected);
         this.addRemoveClass("selected", this.selected);
     },
     // figure out if a bindTarget was put on the child and

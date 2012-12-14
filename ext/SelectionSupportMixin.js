@@ -17,6 +17,13 @@ enyo.Mixin({
         array controller of any selected models.
     */
     selection: null,
+    initMixin: function () {
+        var handlers = this.handlers || (this.handlers = {});
+        // register for when our owner is set to determine
+        // if our multiselect status changes
+        this.addObserver("owner", this.mixinOwnerChanged, this);
+        handlers["onSelectedChanged"] = "selectedModelChanged";
+    },
     /**
         To select a record pass in an index or a reference to the
         model. If multiselect is true, the index of the model will 
@@ -26,7 +33,6 @@ enyo.Mixin({
         and its reference placed in the selection property.
     */
     select: function (model) {
-        console.log("select", model, typeof model);
         var idx;
         if ("number" === typeof model) {
             idx = model;
@@ -36,16 +42,29 @@ enyo.Mixin({
         if (!model) return false;
         if (this.multiselect === true) {
             // first make sure it isn't already selected
-            if (model.get("selected") === true) return;
-            // ok, make sure it isn't somehow in the selection array
-            if (-1 !== this.selection.indexOf(idx)) return;
+            if (model.get("selected") === true) {
+                this.deselect(model);
+                return;
+            }
+            // currently for multiselect if you select an already
+            // selected row it will deselect it
+            if (-1 !== this.selection.indexOf(idx)) {
+                // ok we need to deselect the row instead of select
+                this.deselect(idx);
+                return;
+            }
             this.selection.push(idx);
         } else {
             // if we have a previous selection we need to deselect it
+            if (this.selection && this.selection === model) return;
             this.deselect();
             this.selection = model;
         }
-        model.set({selected: true});
+        if (!model.get("selected")) {
+            model.set({selected: true});
+            this.bubbleUp("onselected", {model: model, index: idx}, this);
+        }
+        this.notifyObservers("selection", null, this.selection);
     },
     /**
         Deselect a model by passing the model reference in or an index
@@ -58,7 +77,6 @@ enyo.Mixin({
         model if only single-selection is enabled. Otherwise it will to nothing.
     */
     deselect: function (model) {
-        console.log("deselect", model);
         //  grab our current selection
         var selection = this.selection;
         // is multiselect enabled
@@ -76,8 +94,10 @@ enyo.Mixin({
             // we can really only deselect a selection if it
             // exists
             if (selection) {
-                selection.set({selected: false});
+                if (selection.get("selected")) selection.set({selected: false});
                 this.selection = null;
+                this.bubbleUp("ondeselected", {model: model, index: idx}, this);
+                this.notifyObservers("selection", null, this.selection);
             }
             return;
         }
@@ -100,15 +120,28 @@ enyo.Mixin({
             // ok, remove it from the selection and set the selected
             // state to false
             selection.splice(sel, 1);
-            model.set({selected: false});
-            return;
+            if (!model.get("selected")) {
+                model.set({selected: false});
+            }
+            this.bubbleUp("ondeselected", {model: model, index: idx}, this);
+            this.notifyObservers("selection", null, this.selection);
         }
         // if only single-selection is enabled test to see if the
         // model is actually the selected model
-        if (selection === model) {
+        else if (selection === model) {
             // ok it was, set it to false, reset our selection
-            model.set({selected: false});
+            if (!model.get("selected")) {
+                model.set({selected: false});
+            }
             this.selection = null;
+            this.bubbleUp("ondeselected", {model: model, index: idx}, this);
+            this.notifyObservers("selection", null, this.selection);
+        }
+    },
+    mixinOwnerChanged: function () {
+        var owner = this.owner;
+        if (owner) {
+            this.set("multiselect", owner.multiselect);
         }
     },
     //*@protected
@@ -118,5 +151,21 @@ enyo.Mixin({
                 this.selection = new enyo.ArrayController();
             }
         }
+    },
+    selectedModelChanged: function (sender, event) {
+        var model = event.model;
+        var selected = event.value;
+        var multi = this.multiselect;
+        if (true === multi) {
+            if (true === selected) {
+                this.select(model);
+            } else this.deselect(model);
+        } else {
+            if (true === selected) {
+                if (this.selection === model) return;
+                else this.select(model);
+            }
+        }
+        return true;
     }
 });

@@ -7,15 +7,6 @@
 enyo.Mixin({
     name: "enyo.CommonCollectionViewMixin",
     //*@protected
-    initMixin: function () {
-        // make sure to set the proper multiselect status on the
-        // controller
-        var multiselect = Boolean(this.multiselect);
-        var controller = this.controller;
-        if (controller && "object" === typeof controller) {
-            controller.set("multiselect", multiselect);
-        }
-    },
     /**
         The computed property that will accurately return the components
         as were defined either in an inlined collection list or a

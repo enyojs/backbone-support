@@ -5,8 +5,6 @@
 enyo.kind({
     name: "enyo.CollectionRepeaterController",
     kind: "enyo.CollectionController",
-    // mixins
-    mixins: ["enyo.SelectionSupportMixin"],
     // handlers
     handlers: {
       onpreparerow: "prepareRow"  

@@ -100,9 +100,18 @@ enyo.kind({
     return this.inherited(arguments);
   },
   
-  notifyAll: function () {
-    var targets = this.get("dispatchTargets");
-    if (this.owner && -1 === targets.indexOf(this.owner)) targets.push(this.owner);
-    enyo.forEach(targets, function (target) {target.refreshBindings()});
-  }
+    notifyAll: function () {
+        // we need to do two things, refresh anyones bindings to this
+        // model controller and notify any potential observers on this
+        // model controller itself
+        var targets = this.get("dispatchTargets");
+        var owner = this.owner;
+        var model = this.model;
+        var attrs = enyo.keys(model.attributes);
+        if (owner && -1 === targets.indexOf(owner)) targets.push(owner);
+        enyo.forEach(targets, function (target) {target.refreshBindings()});
+        enyo.forEach(attrs, function (attr) {
+            this.notifyObservers(attr, null, model.get(attr));
+        }, this);
+    }
 });
