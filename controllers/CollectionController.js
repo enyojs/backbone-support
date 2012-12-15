@@ -43,7 +43,8 @@ enyo.kind({
         // controller or any dispatch targets will also receive these
         // events
         oncollectionchange: "modelChanged",
-        oncollectionadd: "modelAdded"
+        oncollectionadd: "modelAdded",
+        oncollectionremove: "modelRemoved"
     },
     create: function () {
         this.inherited(arguments);

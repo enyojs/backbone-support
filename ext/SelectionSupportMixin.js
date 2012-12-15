@@ -130,7 +130,7 @@ enyo.Mixin({
         // model is actually the selected model
         else if (selection === model) {
             // ok it was, set it to false, reset our selection
-            if (!model.get("selected")) {
+            if (model.get("selected")) {
                 model.set({selected: false});
             }
             this.selection = null;
@@ -167,5 +167,18 @@ enyo.Mixin({
             }
         }
         return true;
+    },
+    // TODO: need to add support for multiselect that when a model
+    // is added to the selection set it has its index stored on the object
+    // so in cases like these when we can't match it in the collection we
+    // can still remove it from the selection set!
+    modelRemoved: function (sender, event) {
+        var model = event.model;
+        var selection = this.selection;
+        var multi = this.multiselect;
+        if (multi) return false; // don't support this yet
+        if (selection && model === selection) {
+            this.deselect(model);
+        }
     }
 });

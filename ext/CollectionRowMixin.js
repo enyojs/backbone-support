@@ -25,6 +25,7 @@ enyo.Mixin({
     // clean up all the auto bindings when the view is destroyed
     destroyMixin: function () {
         this.clearAutoBindings();
+        this.inherited(arguments);
     },
     // here we create what would otherwise be normal bindings but
     // give them a special property so we can select them via the
