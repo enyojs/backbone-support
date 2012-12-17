@@ -98,7 +98,11 @@ enyo.kind({
             // events just the same
             else inst.addDispatchTarget(this);
             // go ahead and refresh any bindings
+            // but make sure not to emit the changes until all properties
+            // have actually been updated
+            this.stopNotifications();
             this.refreshBindings();
+            this.startNotifications();
         });
     },
     //*@public
