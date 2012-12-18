@@ -41,7 +41,8 @@ enyo.kind({
         OK:         0x00,
         LOADING:    0x01,
         ERROR:      0x02,
-        responders: ["add", "remove", "change", "reset"]
+        responders: ["add", "remove", "change", "reset"],
+        collectionCount: 0
     },
     //*@protected
     // this property eventually houses all of the registered listeners
@@ -51,6 +52,7 @@ enyo.kind({
         this.modelChanged();
         this.inherited(arguments);
         this.setupCollectionObservers();
+        enyo.Collection.collectionCount++;
     },
     modelChanged: function () {
         var model = this.model;
@@ -153,7 +155,7 @@ enyo.kind({
     didAdd: function (model, collection, params) {
         this.notifyObservers("models", null, this.models);
         this.notifyObservers("length", null, this.length);
-        this.dispatchBubble("oncollectionadd", {model: model});
+        this.dispatchBubble("oncollectionadd", {model: model, type: "oncollectionadd"});
     },
     /**
         When a model is removed from the collection this method
@@ -163,7 +165,7 @@ enyo.kind({
     didRemove: function (model, collection, params) {
         this.notifyObservers("models", null, this.models);
         this.notifyObservers("length", null, this.length);
-        this.dispatchBubble("oncollectionremove", {model: model});
+        this.dispatchBubble("oncollectionremove", {model: model, type: "oncollectionremove"});
     },
     /**
         Whenever an individual record emits the _changed_ event
@@ -175,14 +177,18 @@ enyo.kind({
         var prop;
         var eventName;
         this.notifyObservers("models", null, this.models);
-        this.dispatchBubble("oncollectionchange", {model: model});
+        this.dispatchBubble("oncollectionchange", {model: model, type: "oncollectionchange"});
         // lets go a step further and emit a specific event
         // that can be listened for related to the attributes
         // that changed
         for (prop in changed) {
             if (!changed.hasOwnProperty(prop)) continue;
             eventName = enyo.format("on%.Changed", enyo.cap(prop));
-            this.dispatchBubble(eventName, {model: model, value: changed[prop]});
+            this.dispatchBubble(eventName, {
+                model: model,
+                value: changed[prop],
+                type: eventName
+            });
         }
     },
     /**
@@ -195,7 +201,7 @@ enyo.kind({
     didReset: function (collection, params) {
         this.notifyObservers("length", null, this.length);
         this.notifyObservers("models", null, this.models);
-        this.dispatchBubble("oncollectionreset", {});
+        this.dispatchBubble("oncollectionreset", {type: "oncollectionreset"});
     },
     /**
         This method is responsible for properly registering observers
@@ -222,6 +228,7 @@ enyo.kind({
             this.off(responder, observers[responder]);
         }
         this.inherited(arguments);
+        enyo.Collection.collectionCount--;
     },
     /**
         If the owner changed we want to make sure we have a model defined
