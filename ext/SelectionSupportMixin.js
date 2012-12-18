@@ -22,6 +22,7 @@ enyo.Mixin({
         // register for when our owner is set to determine
         // if our multiselect status changes
         this.addObserver("owner", this.mixinOwnerChanged, this);
+        this.addObserver("collection", this.mixinCollectionChanged, this);
         handlers["onSelectedChanged"] = "selectedModelChanged";
     },
     /**
@@ -151,6 +152,12 @@ enyo.Mixin({
                 this.selection = new enyo.ArrayController();
             }
         }
+    },
+    mixinCollectionChanged: function () {
+        if (this.multiselect) {
+            this.selection = new enyo.ArrayController();
+            this.notifyObservers("selection", null, this.selection);
+        } else this.deselect();
     },
     selectedModelChanged: function (sender, event) {
         var model = event.model;
