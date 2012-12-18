@@ -12,6 +12,13 @@ enyo.kind({
   extendFrom: [
     {base: "enyo.Backbone.Model", name: "model", preserve: true}
   ],
+  statics: {
+      modelCount: 0
+  },
+  constructor: function () {
+      this.inherited(arguments);
+      enyo.Model.modelCount++;
+  },
   //*@public
   get: function (prop) {
     // we want to test and see if the model returns a value
@@ -48,5 +55,9 @@ enyo.kind({
     }
     // use the default
     return this.inherited(arguments);
+  },
+  destroy: function () {
+      this.inherited(arguments);
+      enyo.Model.modelCount--;
   }
 });
