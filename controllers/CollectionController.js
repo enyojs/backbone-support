@@ -27,8 +27,6 @@ enyo.kind({
         status: enyo.Collection.OK,
         // the current length of the collection
         length: 0,
-        // a reference to the array of models in the collection
-        data: null,
         // the same reference to the array of models in the collection
         // but is typically used by other controllers when proxying
         // the data of this controller
@@ -56,12 +54,19 @@ enyo.kind({
     // is available
     bindings: [
         {from: "collection.length", to: "length"},
-        {from: "collection.models", to: "data"},
         {from: "collection.status", to: "status"},
         // this is so that this kind can be used as a collection for
         // other collection controllers
         {from: "collection.models", to: "models"}
     ],
+    //*@public
+    /**
+        Override this computed property to return any filtered
+        content.
+    */
+    data: enyo.Computed(function () {
+        return this.get("models");
+    }, "models"),
     /**
         This method is designed to allow for several scenarios. If
         the kind definition supplied a collection constructor or
