@@ -173,6 +173,7 @@ enyo.kind({
         event as well for observers in the controller layer.
     */
     didDestroy: function (model) {
+        this.log(model);
         this.notifyObservers("models", null, this.models);
         this.notifyObservers("length", null, this.length);
         this.dispatchBubble("oncollectiondestroy", {model: model, type: "oncollectiondestroy"});
@@ -211,7 +212,9 @@ enyo.kind({
     didReset: function (collection, params) {
         this.notifyObservers("length", null, this.length);
         this.notifyObservers("models", null, this.models);
-        this.dispatchBubble("oncollectionreset", {type: "oncollectionreset"});
+        params = params? params: {};
+        params.type = "oncollectionreset";
+        this.dispatchBubble("oncollectionreset", params);
     },
     /**
         This method is responsible for properly registering observers

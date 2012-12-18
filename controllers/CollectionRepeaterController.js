@@ -7,7 +7,9 @@ enyo.kind({
     kind: "enyo.CollectionController",
     // handlers
     handlers: {
-      onpreparerow: "prepareRow"
+      onpreparerow: "prepareRow",
+      // collection events
+      oncollectionreset: "collectionChanged"
     },
     render: function (idx) {
         // if we do not have an owner we can't do anything
@@ -49,50 +51,16 @@ enyo.kind({
             row = view.createComponent(def);
             row.render();
         }
-                
+        
         // update the controller of the row so it will have the new data
         row.controller.set("model", record);
-        /*
-        for (; idx < len; ++idx) {
-            // grab the record
-            record = data[idx];
-            // if we can't find an instanced row for this index of
-            // the dataset we have to create one
-            if (!(row = rows[idx])) {
-                row = view.createComponent(def);
-                // we need to render it so it has a display
-                // to actually update
-                row.render();
-            }
-            // now we have a row so we hand it the data for the record
-            // and we should be done
-            row.controller.set("model", record);
-        }
-        // now the final step is to make sure if have too many children
-        // to go ahead and get rid of them for now
-        if (idx < rows.length) {
-            // grab all the leftovers
-            rows = rows.slice(idx);
-            // destroy them all
-            enyo.forEach(rows, function (row) {row.destroy()});
-        }
-        */
     },
-    //modelChanged: function (sender, event) {
-    //    this.log();
-    //    var model = event.model;
-    //    var idx = this.indexOf(model);
-    //    if (model && idx) this.render(idx);
-    //},
     collectionChanged: function () {
-        this.log(this.id, this.collection? this.collection.id: null);
         this.inherited(arguments);
-        if (this.length) {
-            // if the collection already has content we need to ensure
-            // that we render it otherwise it won't know to until some
-            // other event fires
-            this.renderAllRows();
-        }
+        // if the collection already has content we need to ensure
+        // that we render it otherwise it won't know to until some
+        // other event fires
+        this.renderAllRows();
     },
     renderAllRows: function () {
         var data = this.get("data") || [];

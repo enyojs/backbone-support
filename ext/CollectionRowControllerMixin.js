@@ -43,7 +43,7 @@ enyo.Mixin({
     
     didDestroy: function () {
         // turns out this is pretty easy
-        this.release();
+        this.releaseModel();
         this.model = null;
         // the current model will have also been the reference
         // to our `lastModel` so we clear that as well

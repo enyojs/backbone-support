@@ -91,6 +91,9 @@ enyo.Mixin({
         this.inherited(arguments);
         if (this.controller) {
             this.controller.extend(enyo.CollectionRowControllerMixin);
+            // we need to recreate the responders so they will reference
+            // the newly overloaded methods
+            this.controller.createResponders();
             this.clearAutoBindings();
             this.initAutoBindings();
         }

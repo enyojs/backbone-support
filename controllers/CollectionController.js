@@ -43,7 +43,8 @@ enyo.kind({
         oncollectionchange: "modelChanged",
         oncollectionadd: "modelAdded",
         oncollectionremove: "modelRemoved",
-        oncollectiondestroy: "modelDestroyed"
+        oncollectiondestroy: "modelDestroyed",
+        oncollectionreset: "modelsReset"
     },
     create: function () {
         this.inherited(arguments);

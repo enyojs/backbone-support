@@ -18,21 +18,29 @@ enyo.kind({
     },
     //*@protected
     constructor: function () {
-        // we want to create a set of responders to attach to
-        // any models this controller will see, we do this once
-        // for efficiency
-        var responders = this.responders = {};
         this.inherited(arguments);
-        // these methods will respond to the `change` and `destroy`
-        // events of the underlying model (if any)
-        responders.change = enyo.bind(this, this.didUpdate);
-        responders.destroy = enyo.bind(this, this.didDestroy);
+        this.createResponders();
     },
     //*@protected
     create: function () {
         this.inherited(arguments);
         this.modelChanged();
         enyo.ModelController.modelControllerCount++;
+    },
+    //*@protected
+    createResponders: function () {
+        // we want to create and store these responders so that
+        // we can cleanly remove them later when we need to release
+        // the model
+        var responders = this.responders || (this.responders = {});
+        var model = this.model;
+        if (model && responders.change && responders.destroy)
+            this.releaseModel(model);
+        // these methods will respond to the `change` and `destroy`
+        // events of the underlying model (if any)
+        responders.change = enyo.bind(this, this.didUpdate);
+        responders.destroy = enyo.bind(this, this.didDestroy);
+        if (model) this.initModel(model);
     },
     //*@protected
     modelChanged: function () {
@@ -44,7 +52,7 @@ enyo.kind({
             // if we don't have anything then we were reset but
             // that means we need to cleanup if we had one already
             if (!inst) {
-                if (last) this.release();
+                if (last) this.releaseModel(last);
                 this.lastModel = null;
             } else {
                 model = inst;
@@ -66,8 +74,8 @@ enyo.kind({
         }
     },
     //*@protected
-    release: function (model) {
-        // we need to release the model from our registered handlers
+    releaseModel: function (model) {
+        // we need to releaseModel the model from our registered handlers
         var responders = this.responders;
         var key;
         // will use the parameter first or the `model` property, or
@@ -96,12 +104,12 @@ enyo.kind({
     },
     //*@public
     /**
-        When a model is destroyed we need to catch the event and release
+        When a model is destroyed we need to catch the event and releaseModel
         it from our observers.
     */
     didDestroy: function () {
         // turns out this is pretty easy
-        this.release();
+        this.releaseModel();
         this.model = null;
         // the current model will have also been the reference
         // to our `lastModel` so we clear that as well
@@ -110,9 +118,9 @@ enyo.kind({
     },
     //*@protected
     destroy: function () {
-        // we want to release our references to the models and
+        // we want to releaseModel our references to the models and
         // free them of our observers is possible
-        this.release();
+        this.releaseModel();
         this.model = null;
         this.lastModel = null;
         // inherited
