@@ -46,11 +46,11 @@ enyo.kind({
             if (!inst) {
                 if (last) this.release();
                 this.lastModel = null;
-                return;
+            } else {
+                model = inst;
+                this.lastModel = model;
+                this.initModel(model);
             }
-            model = inst;
-            this.lastModel = model;
-            this.initModel(model);
             this.notifyAll();
         });
     },
@@ -174,31 +174,5 @@ enyo.kind({
                 if ("function" === typeof fn) fn();
             }, this);
         }
-        
-        
-        // so we'll grab the known observers and any interested
-        // objects (owner or dispatchTargets) and notify them of
-        // all of our observed properties
-        //var targets = this.dispatchTargets || [];
-        //var owner = this.owner;
-        //var bindings;
-        //var len;
-        //var idx = 0;
-        //var target;
-        //var observers = this._observers;
-        //var key;
-        //// add the owner to the array of anything we're notifying now
-        //if (owner && -1 === targets.indexOf(owner)) targets.unshift(owner);
-        //// for each of the targets we will first refresh their bindings
-        //// that are associated with this object
-        //for (len = targets.length; idx < len; ++idx) {
-        //    target = targets[idx];
-        //    bindings = enyo.filter(target._bindings, function (binding) {
-        //        return binding._target === this || binding._source === this;
-        //    }, this);
-        //    if (bindings && bindings.length) target.refreshBindings(bindings);
-        //}
-        //// now we want to execute observers but we have the added task of NOT
-        //// firing the observers related 
     }
 });

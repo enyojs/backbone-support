@@ -41,7 +41,7 @@ enyo.kind({
         OK:         0x00,
         LOADING:    0x01,
         ERROR:      0x02,
-        responders: ["add", "remove", "change", "reset"],
+        responders: ["add", "remove", "change", "reset", "destroy"],
         collectionCount: 0
     },
     //*@protected
@@ -168,6 +168,16 @@ enyo.kind({
         this.dispatchBubble("oncollectionremove", {model: model, type: "oncollectionremove"});
     },
     /**
+        When a model is destroyed the collection that owned it receives
+        a _destroy_ event. This method will propagate a _oncollectiondestroy_
+        event as well for observers in the controller layer.
+    */
+    didDestroy: function (model) {
+        this.notifyObservers("models", null, this.models);
+        this.notifyObservers("length", null, this.length);
+        this.dispatchBubble("oncollectiondestroy", {model: model, type: "oncollectiondestroy"});
+    },
+    /**
         Whenever an individual record emits the _changed_ event
         this method will notify any listeners which model changed.
         Will bubble the _oncollectionchange_ event.
@@ -237,5 +247,13 @@ enyo.kind({
     ownerChanged: function () {
         this.modelChanged();
         return this.inherited(arguments);
+    },
+    /**
+        Overloaded getter to support the appropriate api for backbone.
+    */
+    get: function (prop) {
+        if ("string" !== typeof prop) {
+            return this.stored["collection"].get.apply(this, arguments);
+        } else return this.inherited(arguments);
     }
 })

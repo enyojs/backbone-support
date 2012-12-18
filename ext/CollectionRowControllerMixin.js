@@ -26,7 +26,12 @@ enyo.Mixin({
     // cannot be overridden easily
     tapped: function (sender, event) {
         var model = this.model;
-        var idx = model.collection.indexOf(model);
+        var collection;
+        var idx;
+        if (!model) return false;
+        collection = model.collection;
+        if (!collection) return false;
+        idx = collection.indexOf(model);
         // without making this too hairy we go ahead and bubble another
         // synchronous event up to the list's controller to make sure
         // we prepare the correct row and it will also handle making sure
@@ -34,5 +39,16 @@ enyo.Mixin({
         this.bubbleUp("onpreparerow", {index: "number" === typeof event.index?
             event.index: idx}, this);
         return true;
-    }
+    },
+    
+    didDestroy: function () {
+        // turns out this is pretty easy
+        this.release();
+        this.model = null;
+        // the current model will have also been the reference
+        // to our `lastModel` so we clear that as well
+        this.lastModel = null;
+        this.owner.destroy();
+        this.destroy();
+    },
 });

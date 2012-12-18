@@ -16,9 +16,9 @@ enyo.kind({
         // settings of our owner
         var view = this.owner;
         // we need to have our data
-        var data = this.get("data");
+        var data = this.get("data") || [];
         // our known length
-        var len = this.length;
+        var len = data.length;
         // we need the rows of the view if any so we can reuse
         // them when possible
         var rows = view.get("rows");
@@ -88,13 +88,18 @@ enyo.kind({
         this.log(this.id, this.collection? this.collection.id: null);
         this.inherited(arguments);
         if (this.length) {
-            // so the assumption here is that the collection already has
-            // content so the default methods/responders won't trigger a
-            // render, so lets render all the rows we have data for now
-            for (var idx=0, len=this.length; idx<len; ++idx) this.render(idx);
-            // go ahead and cleanup additional rows we might have
-            this.prune();
+            // if the collection already has content we need to ensure
+            // that we render it otherwise it won't know to until some
+            // other event fires
+            this.renderAllRows();
         }
+    },
+    renderAllRows: function () {
+        var data = this.get("data") || [];
+        var len = data.length;
+        var idx = 0;
+        for (; idx < len; ++idx) this.render(idx);
+        this.prune();
     },
     modelAdded: function (sender, event) {
         var model = event.model;
@@ -102,15 +107,10 @@ enyo.kind({
         this.log(model.cid, idx);
         if (model && !isNaN(idx) && -1 !== idx) this.render(idx);
     },
-    modelRemoved: function (sender, event) {
-        this.log();
-        var model = event.model;
-        this.log(model.cid);
-    },
     prune: function () {
         // we need to be able to compare the length of our known dataset
         // against the length of the number of rendered rows we have
-        var len = this.length;
+        var len = (this.get("data") || []).length;
         // of course we need our actual owner
         var view = this.owner;
         // placeholder for rows should we be able to get them

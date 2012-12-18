@@ -57,6 +57,7 @@ enyo.kind({
     return this.inherited(arguments);
   },
   destroy: function () {
+      this.stored["model"].destroy.call(this);
       this.inherited(arguments);
       enyo.Model.modelCount--;
   }

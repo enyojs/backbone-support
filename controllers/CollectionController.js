@@ -42,7 +42,8 @@ enyo.kind({
         // events
         oncollectionchange: "modelChanged",
         oncollectionadd: "modelAdded",
-        oncollectionremove: "modelRemoved"
+        oncollectionremove: "modelRemoved",
+        oncollectiondestroy: "modelDestroyed"
     },
     create: function () {
         this.inherited(arguments);
@@ -90,7 +91,7 @@ enyo.kind({
                     if (this.owner.collection) {
                         this.collection = this.owner.collection;
                         return this.collectionChanged();
-                    }
+                    } else return;
                 } else if (this.model) {
                     inst = this.collection = new enyo.Collection();
                     inst.set("model", this.model);
@@ -193,7 +194,6 @@ enyo.kind({
     ownerChanged: function () {
         if ("object" !== typeof this.collection) this.collectionChanged();
         if (this.collection && !this.collection.model && this.model) {
-            console.log("YES!", this.model, this.collection);
             this.collection.set("model", this.model);
         }
         return this.inherited(arguments);
