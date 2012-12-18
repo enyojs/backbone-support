@@ -16,7 +16,7 @@ enyo.kind({
         // settings of our owner
         var view = this.owner;
         // we need to have our data
-        var data = this.data;
+        var data = this.get("data");
         // our known length
         var len = this.length;
         // we need the rows of the view if any so we can reuse

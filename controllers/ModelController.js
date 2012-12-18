@@ -1,117 +1,204 @@
+
+//*@public
+/**
+    
+*/
 enyo.kind({
-  name: "enyo.ModelController",
-  kind: "enyo.Controller",
-  
-  published: {
+    //*@public
+    name: "enyo.ModelController",
+    //*@public
+    kind: "enyo.Controller",
+    //*@public
     model: null,
-    attributes: null,
-    lastModel: {}
-  },
-  
-  isModelController: true,
-  
-  constructor: function (inProps) {
-    if (inProps) this.model = inProps.model;
-    this.inherited(arguments);
-    
-    if (!enyo.modelControllerCount) enyo.modelControllerCount = 1;
-    else enyo.modelControllerCount++;
-    
-    //console.log("created an enyo.ModelController", enyo.modelControllerCount);
-  },
-  
-  create: function () {
-    this.inherited(arguments);
-    this.modelChanged();
-  },
-  
-  modelChanged: function () {
-    var i = 0, attrs, attr, m = this.model, ch = {};
-    // if the model doesn't exist or is set to the same
-    // model as before do not update anything
-    if (!m || this.lastModel.cid === m.cid) return;
-    
-    if (this.lastModel) this.removeModel(this.lastModel);
-    
-    // update our last model
-    this.lastModel = m;
-    
-    // register for attribute changes on the model
-    m.on("change", (this._updateResponder = enyo.bind(this, this.didUpdate)));
-    
-    // register for destroy notification
-    m.on("destroy", (this._destroyResponder = enyo.bind(this, this.didDestroy)));
-    // TODO: is there a time/way this should be disabled?
-    this.notifyAll();
-  },
-  
-  didUpdate: function (model) {
-    var ch, params = model.changedAttributes(), c;
-    ch = params? enyo.keys(params): false;
-    if (ch && ch.length) {
-      this.stopNotifications();
-      while (ch.length) {
-        c = ch.shift();
-        this.notifyObservers(c, model.previous(c), model.get(c));
-      }
-      this.startNotifications();
-    }
-  },
-  
-  didDestroy: function () {
-    this.removeModel();
-  },
-  
-  removeModel: function (model) {
-    var m = model || this.model;
-    if (m && this._updateResponder && this._destroyResponder) {
-      m.off("change", this._updateResponder);
-      m.off("destroy", this._destroyResponder);
-    }
-    if (m === this.model) this.model = null;
-  },
-  
-  destroy: function () {
-    this.removeModel();
-    this.inherited(arguments);
-    enyo.modelControllerCount--;
-    //console.log("just destroyed a model controller");
-  },
-  
-  get: function () {
-    var r;
-    if (this.model) {
-      r = this.model.get.apply(this.model, arguments);
-      if (r !== undefined) return r;
-    }
-    return this.inherited(arguments);
-  },
-  
-  set: function (key, value) {
-    // if the key is either a hash or included as an attribute of the model
-    // then we assume it is a request to set it on the model
-    if (this.model) {
-      if ("string" !== typeof key || key in this.model.attributes) {
-        // even though the api is different for each possibility the outcome
-        // will be the same...
-        return this.model.set(key, value);
-      }
-    }
-    return this.inherited(arguments);
-  },
-  
-    notifyAll: function () {
-        // we need to do two things, refresh anyones bindings to this
-        // model controller and notify any potential observers on this
-        // model controller itself
-        var targets = this.get("dispatchTargets");
-        var owner = this.owner;
+    //*@public
+    lastModel: null,
+    //*@protected
+    statics: {
+        modelControllerCount: 0
+    },
+    //*@protected
+    constructor: function () {
+        // we want to create a set of responders to attach to
+        // any models this controller will see, we do this once
+        // for efficiency
+        var responders = this.responders = {};
+        this.inherited(arguments);
+        // these methods will respond to the `change` and `destroy`
+        // events of the underlying model (if any)
+        responders.change = enyo.bind(this, this.didUpdate);
+        responders.destroy = enyo.bind(this, this.didDestroy);
+    },
+    //*@protected
+    create: function () {
+        this.inherited(arguments);
+        this.modelChanged();
+        enyo.ModelController.modelControllerCount++;
+    },
+    //*@protected
+    modelChanged: function () {
+        this.findAndInstance("model", function (ctor, inst) {
+            // we will compare the new model against the previous
+            // model if necessary
+            var last = this.lastModel;
+            var model;
+            // if we don't have anything then we were reset but
+            // that means we need to cleanup if we had one already
+            if (!inst) {
+                if (last) this.release();
+                this.lastModel = null;
+                return;
+            }
+            model = inst;
+            this.lastModel = model;
+            this.initModel(model);
+            this.notifyAll();
+        });
+    },
+    //*@protected
+    initModel: function (model) {
+        // we need to initialize 
+        var responders = this.responders;
+        var key;
+        for (key in responders) {
+            if (!responders.hasOwnProperty(key)) continue;
+            // using the backbone api we add our listeners
+            model.on(key, responders[key]);
+        }
+    },
+    //*@protected
+    release: function (model) {
+        // we need to release the model from our registered handlers
+        var responders = this.responders;
+        var key;
+        // will use the parameter first or the `model` property, or
+        // the `lastModel` property if the parameter isn't provided
+        // and the `model` property is empty
+        model = model || this.model || this.lastModel;
+        // if we couldn't find one, nothing to do
+        if (!model) return;
+        for (key in responders) model.off(key, responders[key]);
+    },
+    //*@public
+    /**
+        When the underlying proxied model has changed this method is
+        notified. It simply finds any of the changed attributes and
+        notifies any observers/bindings of the change.
+    */
+    didUpdate: function (model) {
+        var changes = model.changedAttributes();
+        var key;
+        for (key in changes) {
+            if (!changes.hasOwnProperty(key)) continue;
+            // here for simplicity we access the previous value from
+            // the backbone api of the model
+            this.notifyObservers(key, model.previous(key), model.get(key));
+        }
+    },
+    //*@public
+    /**
+        When a model is destroyed we need to catch the event and release
+        it from our observers.
+    */
+    didDestroy: function () {
+        // turns out this is pretty easy
+        this.release();
+        this.model = null;
+        // the current model will have also been the reference
+        // to our `lastModel` so we clear that as well
+        this.lastModel = null;
+        this.modelChanged();
+    },
+    //*@protected
+    destroy: function () {
+        // we want to release our references to the models and
+        // free them of our observers is possible
+        this.release();
+        this.model = null;
+        this.lastModel = null;
+        // inherited
+        this.inherited(arguments);
+        // decrement our counter
+        enyo.ModelController.modelControllerCount--;
+    },
+    //*@public
+    get: function (prop) {
+        // we overload this method to first call the method
+        // on the model and if nothing is returned we use our
+        // default
         var model = this.model;
-        var attrs = enyo.keys(model.attributes);
-        if (owner && -1 === targets.indexOf(owner)) targets.push(owner);
-        enyo.forEach(targets, function (target) {target.refreshBindings()});
-        enyo.forEach(attrs, function (attr) {
-            this.notifyObservers(attr, null, model.get(attr));
-        }, this);
+        var ret;
+        if (model && prop in model.attributes) {
+            ret = model.get(prop);
+            // if it isn't undefined we have to hope that the null
+            // or value came back for a reason
+            if (undefined !== ret) return ret;
+        }
+        // otherwise we simply return our normal getter
+        return this.inherited(arguments);
+    },
+    //*@public
+    set: function (prop, value) {
+        // we overload this method to first call the method
+        // on the model if it makes sense otherwise we call
+        // our default setter
+        var model = this.model;
+        if (model) {
+            // the only way we're certain we should be using the
+            // models setter is if the `prop` parameter is actually
+            // an object or if the string is on of the known attributes
+            // of the models properties
+            if ("object" === typeof prop || prop in model.attributes) {
+                return model.set(prop, value);
+            }
+        }
+        return this.inherited(arguments);
+    },
+    //*@protected
+    /**
+        This method attempts to find the correct target(s) and
+        notify them of any/all the possible properties to force
+        them to synchronize to the current values.
+    */
+    notifyAll: function () {
+        // we will try and trick our bindings into firing by simply
+        // triggering all of our registered observers since at this
+        // moment it is the only way to be sure we get all bindings
+        // not just our dispatch targets or owner
+        var observers = this._observers;
+        var handlers;
+        var prop;
+        for (prop in observers) {
+            if (!observers.hasOwnProperty(prop)) continue;
+            handlers = observers[prop];
+            enyo.forEach(handlers, function (fn) {
+                if ("function" === typeof fn) fn();
+            }, this);
+        }
+        
+        
+        // so we'll grab the known observers and any interested
+        // objects (owner or dispatchTargets) and notify them of
+        // all of our observed properties
+        //var targets = this.dispatchTargets || [];
+        //var owner = this.owner;
+        //var bindings;
+        //var len;
+        //var idx = 0;
+        //var target;
+        //var observers = this._observers;
+        //var key;
+        //// add the owner to the array of anything we're notifying now
+        //if (owner && -1 === targets.indexOf(owner)) targets.unshift(owner);
+        //// for each of the targets we will first refresh their bindings
+        //// that are associated with this object
+        //for (len = targets.length; idx < len; ++idx) {
+        //    target = targets[idx];
+        //    bindings = enyo.filter(target._bindings, function (binding) {
+        //        return binding._target === this || binding._source === this;
+        //    }, this);
+        //    if (bindings && bindings.length) target.refreshBindings(bindings);
+        //}
+        //// now we want to execute observers but we have the added task of NOT
+        //// firing the observers related 
     }
 });
