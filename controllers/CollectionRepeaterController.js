@@ -7,9 +7,9 @@ enyo.kind({
     kind: "enyo.CollectionController",
     // handlers
     handlers: {
-      onpreparerow: "prepareRow"  
+      onpreparerow: "prepareRow"
     },
-    render: function () {
+    render: function (idx) {
         // if we do not have an owner we can't do anything
         if (!this.owner) return false;
         // we need to scope the views we create according to the
@@ -31,16 +31,28 @@ enyo.kind({
         // element in the components block - it can have as many
         // nested elements as it wants...
         var def = view.get("items")[0];
-        // so the general logic is this to iterate over our dataset
-        // and for any row that is already created/instanced we reuse
-        // it and if not we create it and if when we're done we have
-        // leftovers we destroy them
-        // our iterator
-        var idx = 0;
         // placeholder for a reference to the row-view
         var row;
         // placeholder for the record
         var record;
+        // the idx is expected to be a number or a model
+        if ("number" !== typeof idx) {
+            // no idea what we're supposed to do with...whatever this is
+            if ("object" !== typeof idx) return false;
+            record = idx;
+            idx = this.indexOf(record);
+        } else record = data[idx];
+        // if the index isn't valid...we can't do anything
+        if (-1 === idx) return false;
+        // try and reuse an existing row if possible
+        if (!(row = rows[idx])) {
+            row = view.createComponent(def);
+            row.render();
+        }
+                
+        // update the controller of the row so it will have the new data
+        row.controller.set("model", record);
+        /*
         for (; idx < len; ++idx) {
             // grab the record
             record = data[idx];
@@ -64,9 +76,55 @@ enyo.kind({
             // destroy them all
             enyo.forEach(rows, function (row) {row.destroy()});
         }
+        */
     },
-    lengthChanged: function () {
-        this.render();
+    //modelChanged: function (sender, event) {
+    //    this.log();
+    //    var model = event.model;
+    //    var idx = this.indexOf(model);
+    //    if (model && idx) this.render(idx);
+    //},
+    collectionChanged: function () {
+        this.log(this.id, this.collection? this.collection.id: null);
+        this.inherited(arguments);
+        if (this.length) {
+            // so the assumption here is that the collection already has
+            // content so the default methods/responders won't trigger a
+            // render, so lets render all the rows we have data for now
+            for (var idx=0, len=this.length; idx<len; ++idx) this.render(idx);
+            // go ahead and cleanup additional rows we might have
+            this.prune();
+        }
+    },
+    modelAdded: function (sender, event) {
+        var model = event.model;
+        var idx = this.indexOf(model);
+        this.log(model.cid, idx);
+        if (model && !isNaN(idx) && -1 !== idx) this.render(idx);
+    },
+    modelRemoved: function (sender, event) {
+        this.log();
+        var model = event.model;
+        this.log(model.cid);
+    },
+    prune: function () {
+        // we need to be able to compare the length of our known dataset
+        // against the length of the number of rendered rows we have
+        var len = this.length;
+        // of course we need our actual owner
+        var view = this.owner;
+        // placeholder for rows should we be able to get them
+        var rows;
+        // if we have no owner view then we can't do anything
+        if (!view) return;
+        // grab the rows associated with our owner
+        rows = view.get("rows");
+        // if we have more data than we do rows then we can't prune
+        // anything, or even if they are the same
+        if (len >= rows.length) return;
+        // otherwise we have to prune off the unnecessary rows we now have
+        rows = rows.slice(len);
+        enyo.forEach(rows, function (row) {row.destroy()});
     },
     prepareRow: function (sender, event) {
         var idx;
