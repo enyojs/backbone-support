@@ -55,12 +55,12 @@ enyo.kind({
     // note that these will still be applied whenever the collection
     // is available
     bindings: [
-        {from: "collection.length", to: "length", oneWay: false},
-        {from: "collection.models", to: "data", oneWay: false},
+        {from: "collection.length", to: "length"},
+        {from: "collection.models", to: "data"},
         {from: "collection.status", to: "status"},
         // this is so that this kind can be used as a collection for
         // other collection controllers
-        {from: "collection.models", to: "models", oneWay: false}
+        {from: "collection.models", to: "models"}
     ],
     /**
         This method is designed to allow for several scenarios. If
@@ -86,10 +86,10 @@ enyo.kind({
                         this.collection = this.owner.collection;
                         return this.collectionChanged();
                     }
-                }
-                // it is possible that it will be set at a later time
-                // so go ahead and rest
-                return;
+                } else if (this.model) {
+                    inst = this.collection = new enyo.Collection();
+                    inst.set("model", this.model);
+                } else return;
             }
             // if we have the constructor we know we're the owner of
             // this collection and we need to notify it of that
@@ -102,7 +102,26 @@ enyo.kind({
             // have actually been updated
             this.stopNotifications();
             this.refreshBindings();
-            this.startNotifications();
+            // this is the simple case
+            if (this.owner) this.startNotifications();
+            else {
+                // otherwise we needed to be able to get all of the bindings refreshed
+                // from the perspective of the dispatch target such that emitting a changed
+                // event that assumes other things, such as, say if the length changed
+                // was emitted prior to the data/models bindings refreshing - would cause
+                // all sorts of issues
+                enyo.forEach(this.dispatchTargets, function (target) {
+                    target.stopNotifications();
+                    // it turns out that controllers that are proxying the content of this
+                    // controller, using it as a collection, are more efficient if they also
+                    // receive the event rather than wait exclusively for dataChanged etc
+                    if (target.collection && this === target.collection) target.collectionChanged();
+                    else target.refreshBindings();
+                    target.startNotifications();
+                }, this);
+                // make sure to start these back up
+                this.startNotifications();
+            }
         });
     },
     //*@public
