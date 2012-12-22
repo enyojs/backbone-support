@@ -4,3 +4,6 @@
 [submodule "foss/underscore"]
 	path = foss/underscore
 	url = https://github.com/documentcloud/underscore.git
+[submodule "foss/backbone-relational"]
+	path = foss/backbone-relational
+	url = https://github.com/PaulUithol/Backbone-relational.git
