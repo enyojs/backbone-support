@@ -62,6 +62,7 @@ enyo.Mixin({
     // the row differently
     selectedChanged: function () {
         this.addRemoveClass("selected", this.selected);
+        this.inherited(arguments);
     },
     // figure out if a bindTarget was put on the child and
     // if not get set it to content, if it was set make sure

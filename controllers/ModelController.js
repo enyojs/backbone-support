@@ -38,8 +38,8 @@ enyo.kind({
             this.releaseModel(model);
         // these methods will respond to the `change` and `destroy`
         // events of the underlying model (if any)
-        responders.change = enyo.bind(this, this.didUpdate);
-        responders.destroy = enyo.bind(this, this.didDestroy);
+        responders["change"] = enyo.bind(this, this.didUpdate);
+        responders["destroy"] = enyo.bind(this, this.didDestroy);
         if (model) this.initModel(model);
     },
     //*@protected
@@ -57,6 +57,7 @@ enyo.kind({
             } else {
                 model = inst;
                 this.lastModel = model;
+                if (last) this.releaseModel(last);
                 this.initModel(model);
             }
             this.notifyAll();

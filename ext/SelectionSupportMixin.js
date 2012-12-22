@@ -22,8 +22,16 @@ enyo.Mixin({
         // register for when our owner is set to determine
         // if our multiselect status changes
         this.addObserver("owner", this.mixinOwnerChanged, this);
-        this.addObserver("collection", this.mixinCollectionChanged, this);
-        handlers["onSelectedChanged"] = "selectedModelChanged";
+        //this.addObserver("collection", this.mixinCollectionChanged, this);
+        //handlers["onmodelchange"] = "selectedModelChanged";
+        //handlers["onSelectedChanged"] = "selectedModelChanged";
+    },
+    collectionDidChange: function (model) {
+        var changed = model.changedAttributes() || {};
+        if ("selected" in changed) {
+            this.selectedModelChanged(model);
+        }
+        return this.inherited(arguments);
     },
     /**
         To select a record pass in an index or a reference to the
@@ -153,15 +161,20 @@ enyo.Mixin({
             }
         }
     },
-    mixinCollectionChanged: function () {
-        if (this.multiselect) {
-            this.selection = new enyo.ArrayController();
-            this.notifyObservers("selection", null, this.selection);
-        } else this.deselect();
+    // this is terribly questionable to let every potential
+    // collection controller attempt to do this - it appears
+    // safe because its a nop if the model is already destroyed
+    // and it forces a reset of selection to anyone listening
+    // but...it still seems wrong, leaving it for now
+    collectionDidReset: function (collection, options) {
+        var models = options.previousModels || [];
+        this.inherited(arguments);
+        enyo.forEach(models, function (model) {
+            model.destroy();
+        });
     },
-    selectedModelChanged: function (sender, event) {
-        var model = event.model;
-        var selected = event.value;
+    selectedModelChanged: function (model) {
+        var selected = model.get("selected");
         var multi = this.multiselect;
         if (true === multi) {
             if (true === selected) {
@@ -171,6 +184,10 @@ enyo.Mixin({
             if (true === selected) {
                 if (this.selection === model) return;
                 else this.select(model);
+            } else if (false === selected) {
+                if (this.selection === model) {
+                    this.deselect(model);
+                }
             }
         }
         return true;
@@ -187,5 +204,13 @@ enyo.Mixin({
         if (selection && model === selection) {
             this.deselect(model);
         }
+    },
+    
+    releaseCollection: function (collection) {
+        var multi = this.multiselect;
+        if (true === multi) {
+            // todo!
+        } else this.deselect();
+        this.inherited(arguments);
     }
 });

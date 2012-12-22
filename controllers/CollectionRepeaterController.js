@@ -9,7 +9,7 @@ enyo.kind({
     handlers: {
       onpreparerow: "prepareRow",
       // collection events
-      oncollectionreset: "collectionChanged"
+      oncollectionadd: "modelAdded"
     },
     render: function (idx) {
         // if we do not have an owner we can't do anything
@@ -57,9 +57,6 @@ enyo.kind({
     },
     collectionChanged: function () {
         this.inherited(arguments);
-        // if the collection already has content we need to ensure
-        // that we render it otherwise it won't know to until some
-        // other event fires
         this.renderAllRows();
     },
     renderAllRows: function () {
@@ -72,7 +69,6 @@ enyo.kind({
     modelAdded: function (sender, event) {
         var model = event.model;
         var idx = this.indexOf(model);
-        this.log(model.cid, idx);
         if (model && !isNaN(idx) && -1 !== idx) this.render(idx);
     },
     prune: function () {

@@ -38,7 +38,7 @@ enyo.Mixin({
         // any other active row is locked first
         this.bubbleUp("onpreparerow", {index: "number" === typeof event.index?
             event.index: idx}, this);
-        return true;
+        //return true;
     },
     
     didDestroy: function () {
@@ -48,6 +48,10 @@ enyo.Mixin({
         // the current model will have also been the reference
         // to our `lastModel` so we clear that as well
         this.lastModel = null;
+        // we set our owners controller (this controller) to null
+        // so its destructor will not loop back on us which is
+        // its default
+        this.owner.controller = null;
         this.owner.destroy();
         this.destroy();
     },

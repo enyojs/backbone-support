@@ -22,7 +22,15 @@ enyo.Mixin({
         of the required collection from the base kind.
     */
     controllerKind: enyo.Computed(function () {
-        return enyo.getPath(this.ctor.prototype.controller);
+        var base = this.base;
+        var ctor = this.ctor;
+        var prototype = base.prototype;
+        var controller = prototype.controller;
+        if (!controller) {
+            prototype = ctor.prototype;
+            controller = prototype.controller;
+        }
+        return enyo.getPath(controller);
     }),
     /** 
         Overloaded controllerChanged to handle the various
@@ -59,18 +67,23 @@ enyo.Mixin({
                 // we need to figure out if the other controller is either
                 // a collection controller or collection, either one will
                 // be useable
-                if ((other instanceof enyo.CollectionController) ||
-                    (other instanceof enyo.Collection)) {    
+                if (other instanceof Backbone.Collection) {    
                     // ok we will assign our collection property to this
                     // instance and let the controller choose it as its
                     // option
                     inst.set("collection", other);
+                } else if (other instanceof enyo.CollectionController) {
+                    //other.addDispatchTarget(inst);
+                    //inst.binding({source: other, from: "models", to: "models"});
+                    //inst.binding({source: other, from: "length", to: "length"});
+                    //inst.proxiedController = other;
+                    inst.binding({source: other, from: "collection", to: "collection"});
                 } else {
                     // this is a problem because we don't know what we can
                     // do with this object that was handed to us
                     return enyo.error(kindName + ": unknown kind used " +
                         "as controller or collection type, must subclass " +
-                        "enyo.Collection or enyo.CollectionController");
+                        "Backbone.Collection or enyo.CollectionController");
                 }
             }
         });
