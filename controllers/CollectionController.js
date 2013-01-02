@@ -134,6 +134,7 @@ enyo.kind({
         See _enyo.Collection.add_
     */
     add: function (model, options) {
+        debugger
         var col = this.collection || this.proxiedController;
         if (!col) return false;
         else return col.add.apply(col, arguments);
