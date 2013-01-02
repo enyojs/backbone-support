@@ -33,7 +33,6 @@ enyo.kind({
             // usually not the case but just making sure
             mixins = item.mixins || [];
             mixins.push("enyo.CollectionRowMixin");
-            mixins.push("enyo.RepeaterRowMixin");
             item.mixins = mixins;
         });
         // our real strategy here is to use a scroller

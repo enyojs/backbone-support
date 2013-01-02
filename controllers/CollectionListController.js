@@ -63,7 +63,9 @@ enyo.kind({
         changed in the collection.
     */
     lengthChanged: function () {
-        if (this.owner) this.owner.refresh();  
+        var owner = this.owner;
+        var len = this.length;
+        if (len && enyo.exists(owner)) owner.refresh();
     },
     /**
         Set up the rows auto bindings if they exist.

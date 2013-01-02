@@ -18,9 +18,9 @@ enyo.Mixin({
     // that automatically fires the initAutoBindings method
     initMixin: function () {
         if (!this.controller) {
+            // this triggers a controllerChanged call
             this.set("controller", "enyo.ModelController");
-        }
-        this.controllerChanged();
+        } else this.controllerChanged();
     },
     // clean up all the auto bindings when the view is destroyed
     destroyMixin: function () {
@@ -112,8 +112,7 @@ enyo.Mixin({
     },
     // computed property for bindable controls in an array
     bindableControls: enyo.Computed(function () {
-        var controls = enyo.clone(this.controls);
-        controls.unshift(this);
+        var controls = [this];
         return this.findBindableControls(controls);
     }),
     // figure out what the bindable controls are including this
@@ -130,4 +129,4 @@ enyo.Mixin({
         });
         return ret;
     }
-})
+});

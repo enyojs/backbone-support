@@ -173,7 +173,7 @@ enyo.kind({
         // triggering all of our registered observers since at this
         // moment it is the only way to be sure we get all bindings
         // not just our dispatch targets or owner
-        var observers = this._observers;
+        var observers = this.observers;
         var handlers;
         var prop;
         for (prop in observers) {
