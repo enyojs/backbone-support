@@ -226,7 +226,7 @@ enyo.kind({
         }
         this.stopNotifications();
         this.set("length", collection.length);
-        this.set("models", collection.models);
+        this.set("models", collection.models, true);
         this.startNotifications();
     },
     
@@ -236,28 +236,28 @@ enyo.kind({
     collectionDidAdd: function (model, collection, options) {
         this.stopNotifications();
         this.set("length", collection.length);
-        this.set("models", collection.models);
+        this.set("models", collection.models, true);
         this.startNotifications();
         this.dispatchBubble("oncollectionadd", {model: model});
     },
     collectionDidRemove: function (model, collection, options) {
         this.stopNotifications();
         this.set("length", collection.length);
-        this.set("models", collection.models);
+        this.set("models", collection.models, true);
         this.startNotifications();
         this.dispatchBubble("oncollectionremove", {model: model});
     },
     collectionDidDestroy: function (model, collection, options) {
         this.stopNotifications();
         this.set("length", collection.length);
-        this.set("models", collection.models);
+        this.set("models", collection.models, true);
         this.startNotifications();
         this.dispatchBubble("oncollectiondestroy", {model: model});
     },
     collectionDidReset: function (collection, options) {
         this.stopNotifications();
         this.set("length", collection.length);
-        this.set("models", collection.models);
+        this.set("models", collection.models, true);
         this.startNotifications();
         this.dispatchBubble("oncollectionreset", options);
     },
