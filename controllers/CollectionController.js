@@ -34,7 +34,7 @@ enyo.kind({
     create: function () {
         this.inherited(arguments);
         this.collectionChanged();
-        if (this.get("autoLoad") === true) enyo.run(this.load, this);
+        if (this.get("autoLoad") === true) enyo.ready(this.load, this);
     },
     //*@public
     /**
@@ -113,8 +113,10 @@ enyo.kind({
     */
     load: function (options) {
         var col = this.collection || this.proxiedController;
+        options = options || {};
+        options.success = enyo.bind(this, this.collectionDidLoad);
         if (!col) return false;
-        else return col.fetch.apply(col, arguments);
+        else return col.fetch.call(col, options);
     },
     /**
         See _enyo.Collection.fetch_
@@ -194,7 +196,7 @@ enyo.kind({
         // we can cleanly remove them later when we need to release
         // the collection
         var responders = this.responders || (this.responders = {});
-        var collection = this.collection;
+        var collection = "object" === typeof this.collection && this.collection;
         if (collection && responders.change)
             this.releaseCollection(collection);
         // these methods will respond to the `change` and `destroy`
@@ -229,37 +231,39 @@ enyo.kind({
         this.set("models", collection.models, true);
         this.startNotifications();
     },
-    
+    collectionDidLoad: function () {
+        this.dispatchBubble("oncollectionloaded", {}, this);
+    },
     collectionDidChange: function (model) {
-        this.dispatchBubble("onmodelchange", {model: model});
+        this.dispatchBubble("onmodelchange", {model: model}, this);
     },
     collectionDidAdd: function (model, collection, options) {
         this.stopNotifications();
         this.set("length", collection.length);
         this.set("models", collection.models, true);
         this.startNotifications();
-        this.dispatchBubble("oncollectionadd", {model: model});
+        this.dispatchBubble("oncollectionadd", {model: model}, this);
     },
     collectionDidRemove: function (model, collection, options) {
         this.stopNotifications();
         this.set("length", collection.length);
         this.set("models", collection.models, true);
         this.startNotifications();
-        this.dispatchBubble("oncollectionremove", {model: model});
+        this.dispatchBubble("oncollectionremove", {model: model}, this);
     },
     collectionDidDestroy: function (model, collection, options) {
         this.stopNotifications();
         this.set("length", collection.length);
         this.set("models", collection.models, true);
         this.startNotifications();
-        this.dispatchBubble("oncollectiondestroy", {model: model});
+        this.dispatchBubble("oncollectiondestroy", {model: model}, this);
     },
     collectionDidReset: function (collection, options) {
         this.stopNotifications();
         this.set("length", collection.length);
         this.set("models", collection.models, true);
         this.startNotifications();
-        this.dispatchBubble("oncollectionreset", options);
+        this.dispatchBubble("oncollectionreset", options, this);
     },
     
     destroy: function () {
