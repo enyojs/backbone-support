@@ -63,5 +63,16 @@ enyo.kind({
             props.originalName = props.name;
             props.name = enyo.uid("_repeater");
         }
+    },
+    //*@protected
+    /**
+        This is a temporary workaround.
+    */
+    reflow: function () {
+        var bounds = this.getBounds();
+        var height = bounds.height;
+        var client = this.$.client;
+        if (enyo.exists(client)) client.setBounds({height: height});
+        this.inherited(arguments);
     }
 });
