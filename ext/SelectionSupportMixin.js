@@ -18,10 +18,10 @@ enyo.Mixin({
     */
     selection: null,
     initMixin: function () {
-        var handlers = this.handlers || (this.handlers = {});
         // register for when our owner is set to determine
         // if our multiselect status changes
         this.addObserver("owner", this.mixinOwnerChanged, this);
+        if (this.createResponders) this.createResponders();
         //this.addObserver("collection", this.mixinCollectionChanged, this);
         //handlers["onmodelchange"] = "selectedModelChanged";
         //handlers["onSelectedChanged"] = "selectedModelChanged";
@@ -168,10 +168,10 @@ enyo.Mixin({
     // but...it still seems wrong, leaving it for now
     collectionDidReset: function (collection, options) {
         var models = options.previousModels || [];
-        this.inherited(arguments);
         enyo.forEach(models, function (model) {
             model.destroy();
         });
+        this.inherited(arguments);
     },
     selectedModelChanged: function (model) {
         var selected = model.get("selected");

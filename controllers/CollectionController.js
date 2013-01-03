@@ -6,19 +6,21 @@
 enyo.kind({
     name: "enyo.CollectionController",
     kind: "enyo.ArrayController",
-    published: {
-        // a string or function for the desired collection
-        collection: null,
-        // auto-fire the load/fetch method of the underlying
-        // collection kind
-        autoLoad: false,
-        // the current length of the collection
-        length: 0,
-        // the same reference to the array of models in the collection
-        // but is typically used by other controllers when proxying
-        // the data of this controller
-        models: null
-    },
+    //*@public
+    // a string or function for the desired collection
+    collection: null,
+    //*@public
+    /**
+        Auto-fire the load/fetch method of the underlying
+        collection kind
+    */
+    autoLoad: false,
+    // the current length of the collection
+    length: 0,
+    // the same reference to the array of models in the collection
+    // but is typically used by other controllers when proxying
+    // the data of this controller
+    models: null,
     //*@protected
     lastCollection: null,
     //*@protected
@@ -180,7 +182,7 @@ enyo.kind({
         If the owner is changed we need to update accordingly.
     */
     ownerChanged: function () {
-        if (null === this.collection || undefined === this.collection) this.collectionChanged();
+        if (!this.collection) this.collectionChanged();
         if (this.collection && !this.collection.model && this.model) {
             this.collection.set("model", this.model);
         }
@@ -261,7 +263,6 @@ enyo.kind({
     },
     
     destroy: function () {
-        this.log(arguments);
         var last = this.lastCollection;
         if (last) this.releaseCollection(last);
         this.lastCollection = null;
