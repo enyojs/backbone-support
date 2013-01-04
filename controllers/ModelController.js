@@ -136,11 +136,16 @@ enyo.kind({
         // default
         var model = this.model;
         var ret;
+        var path = prop.split(".");
+        if (1 < path.length) {
+            prop = path[0];
+        }
+        path = path.join(".");
         if (model && prop in model.attributes) {
-            ret = model.get(prop);
+            ret = model.get(path);
             // if it isn't undefined we have to hope that the null
             // or value came back for a reason
-            if (undefined !== ret) return ret;
+            if (enyo.exists(ret)) return ret;
         }
         // otherwise we simply return our normal getter
         return this.inherited(arguments);
