@@ -34,7 +34,7 @@ enyo.kind({
     create: function () {
         this.inherited(arguments);
         this.collectionChanged();
-        if (this.get("autoLoad") === true) enyo.ready(this.load, this);
+        if (this.get("autoLoad") === true) this.load();
     },
     //*@public
     /**
@@ -112,25 +112,25 @@ enyo.kind({
         See _enyo.Collection.fetch_
     */
     load: function (options) {
-        var col = this.collection || this.proxiedController;
+        var col = this.collection;
         options = options || {};
         options.success = enyo.bind(this, this.collectionDidLoad);
         if (!col) return false;
-        else return col.fetch.call(col, options);
+        else {
+            return col.fetch.call(col, options);
+        }
     },
     /**
         See _enyo.Collection.fetch_
     */
     fetch: function (options) {
-        var col = this.collection || this.proxiedController;
-        if (!col) return false;
-        else return col.fetch.apply(col, arguments);
+        return this.load.apply(this, arguments);
     },
     /**
         See _enyo.Collection.reset_
     */
     reset: function (models, options) {
-        var col = this.collection || this.proxiedController;
+        var col = this.collection;
         if (!col) return false;
         else return col.reset.apply(col, arguments);
     },
@@ -138,7 +138,7 @@ enyo.kind({
         See _enyo.Collection.add_
     */
     add: function (model, options) {
-        var col = this.collection || this.proxiedController;
+        var col = this.collection;
         if (!col) return false;
         else return col.add.apply(col, arguments);
     },
@@ -146,7 +146,7 @@ enyo.kind({
         See _enyo.Collection.remove_
     */
     remove: function (model, options) {
-        var col = this.collection || this.proxiedController;
+        var col = this.collection;
         if (!col) return false;
         else return col.remove.apply(col, arguments);
     },
@@ -154,7 +154,7 @@ enyo.kind({
         See _enyo.Collection.at_
     */
     at: function (idx) {
-        var col = this.collection || this.proxiedController;
+        var col = this.collection;
         if (!col) return false;
         else return col.at.apply(col, arguments);
     },
@@ -162,19 +162,19 @@ enyo.kind({
         See _enyo.Collection.indexOf_
     */
     indexOf: function (model) {
-        var col = this.collection || this.proxiedController;
+        var col = this.collection;
         if (!col) return false;
         else return col.indexOf.apply(col, arguments);
     },
     
     on: function (event, fn) {
-        var col = this.collection || this.proxiedController;
+        var col = this.collection;
         if (!col) return false;
         else return col.on.apply(col, arguments);
     },
     
     off: function (event, fn) {
-        var col = this.collection || this.proxiedController;
+        var col = this.collection;
         if (!col) return false;
         else return col.off.apply(col, arguments);
     },
