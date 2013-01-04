@@ -94,7 +94,7 @@ enyo.kind({
         notifies any observers/bindings of the change.
     */
     didUpdate: function (model) {
-        var changes = model.changedAttributes();
+        var changes = model.attributes;
         var key;
         for (key in changes) {
             if (!changes.hasOwnProperty(key)) continue;
