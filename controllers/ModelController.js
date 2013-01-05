@@ -1,7 +1,11 @@
 
 //*@public
 /**
-    
+    The _enyo.ModelController_ kind is designed to proxy
+    data from a single Backbone.Model instance. Views can
+    bind to properties on this controller as if it was the
+    model and those bindings will automatically update as
+    the model is updated or swapped for another model.
 */
 enyo.kind({
     //*@public

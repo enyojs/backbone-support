@@ -1,6 +1,12 @@
 
 //*@public
 /**
+    The _enyo.CollectionList_ is like an _enyo.List_ except it
+    is designed to work with _enyo.CollectionController_s and
+    Backbone.Collections out of the box. It also differs in that
+    it depends on bindings to setup row data. Build your row (view)
+    with the auto-binding flags on components that need a property
+    bound.
 */
 enyo.kind({
     name: "enyo.CollectionList",

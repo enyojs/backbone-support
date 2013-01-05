@@ -73,10 +73,6 @@ enyo.Mixin({
                     // option
                     inst.set("collection", other);
                 } else if (other instanceof enyo.CollectionController) {
-                    //other.addDispatchTarget(inst);
-                    //inst.binding({source: other, from: "models", to: "models"});
-                    //inst.binding({source: other, from: "length", to: "length"});
-                    //inst.proxiedController = other;
                     inst.binding({source: other, from: "collection", to: "collection"});
                 } else {
                     // this is a problem because we don't know what we can
