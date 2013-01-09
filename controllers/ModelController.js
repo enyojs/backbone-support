@@ -187,10 +187,45 @@ enyo.kind({
         var prop;
         for (prop in observers) {
             if (!observers.hasOwnProperty(prop)) continue;
+            if (true === this.isAttribute(prop)) continue;
             handlers = observers[prop];
             enyo.forEach(handlers, function (fn) {
                 if ("function" === typeof fn) fn();
             }, this);
+        }
+        this.notifyAttributes();
+    },
+    //*@public
+    /**
+        Takes a string parameter and returns a boolean true|false
+        depending on whether or not the parameter is an attribute
+        of the model. If no model is present it will always return
+        false.
+    */
+    isAttribute: function (prop) {
+        var model = this.model
+        var attributes;
+        if (model) {
+            attributes = model.attributes;
+            return (prop in attributes);
+        }
+        return false;
+    },
+    //*@protected
+    /**
+        Calls the notification for any attributes of the models to
+        trigger responders.
+    */
+    notifyAttributes: function () {
+        var model = this.model;
+        var attributes;
+        var prop;
+        if (model) {
+            attributes = model.attributes;
+            for (prop in attributes) {
+                if (!attributes.hasOwnProperty(prop)) continue;
+                this.notifyObservers(prop, null, model.get(prop));
+            }
         }
     }
 });
