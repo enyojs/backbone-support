@@ -90,6 +90,12 @@ enyo.Mixin({
     // auto fire this changed event when the controller is updated
     controllerChanged: function () {
         this.inherited(arguments);
+        this.refreshController();
+    },
+    refreshController: function () {
+        if (!this.bindings) {
+            return this.addObserver("didSetupBindings", this.refreshController, this);
+        }
         if (this.controller) {
             this.controller.extend(enyo.CollectionRowControllerMixin);
             // we need to recreate the responders so they will reference
