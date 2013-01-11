@@ -1,6 +1,13 @@
 
 //*@public
 /**
+    The _enyo.CollectionRepeaterController_ kind is a special
+    _enyo.CollectionController_ designed to work with the
+    _enyo.CollectionRepeater_ view kind. You can explicitly
+    subclass this kind or set the _controller_ property on an
+    _enyo.CollectionRepeater_ view to a normal _enyo.CollectionController_
+    instance and it will automatically proxy the content via this
+    kind.
 */
 enyo.kind({
     name: "enyo.CollectionRepeaterController",

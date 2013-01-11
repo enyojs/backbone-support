@@ -1,6 +1,11 @@
 
 //*@public
 /**
+    The _enyo.CollectionRepeater_ is much like _enyo.CollectionList_
+    except it does not use a flyweight pattern. Each row is an active
+    control and as such care should be taken when deciding to use this
+    kind. It is great for medium sized lists that require significant
+    interaction inline such as input fields.
 */
 enyo.kind({
     name: "enyo.CollectionRepeater",

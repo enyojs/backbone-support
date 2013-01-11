@@ -27,7 +27,8 @@ enyo.kind({
         // from the row controller
         onpreparerow: "prepareRow",
         // collection related events
-        oncollectionreset: "didReset"
+        oncollectionreset: "didReset",
+        onmodelchange: "modelChanged"
     },
     bindings: [
         // we keep a local copy of the targets that the view

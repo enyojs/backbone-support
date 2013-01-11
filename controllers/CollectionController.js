@@ -1,7 +1,10 @@
 
 //*@public
 /**
-
+    The _enyo.CollectionController_ kind is designed to help proxy
+    a Backbone.Collection's data to a other enyo objects. It can be
+    used to proxy one collection's data to many other collection
+    controllers (e.g. _enyo.CollectionListController_).
 */
 enyo.kind({
     name: "enyo.CollectionController",
@@ -45,8 +48,6 @@ enyo.kind({
         return this.get("models");
     }, "models"),
     //*@protected
-    /**
-    */
     collectionChanged: function () {
         this.findAndInstance("collection", function (ctor, inst) {
             var last = this.lastCollection;
