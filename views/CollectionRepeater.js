@@ -10,6 +10,7 @@ enyo.kind({
     controlParentName: "client",
     // support for multiselection
     multiselect: false,
+    includeScroller: true,
     tools: [
         {name: "client", kind: "enyo.Scroller", isChrome: true}
     ],
@@ -36,7 +37,9 @@ enyo.kind({
             item.mixins = mixins;
         });
         // our real strategy here is to use a scroller
-        this.createComponents(this.tools);
+        if (this.includeScroller) {
+            this.createComponents(this.tools);
+        }
     },
     /**
         A computed property that returns only the views/controls that are
@@ -46,9 +49,13 @@ enyo.kind({
         list body!
     */
     rows: enyo.Computed(function () {
-        return enyo.filter(this.controls, function (control) {
-            return control.parent && control.parent.name === "strategy";
-        });
+        if (this.includeScroller) {
+            return enyo.filter(this.controls, function (control) {
+                return control.parent && control.parent.name === "strategy";
+            });
+        } else {
+            return this.controls;
+        }
     }),
     /**
         Every time we create a new row we need to make sure it has a unique
@@ -69,10 +76,12 @@ enyo.kind({
         This is a temporary workaround.
     */
     reflow: function () {
-        var bounds = this.getBounds();
-        var height = bounds.height;
-        var client = this.$.client;
-        if (enyo.exists(client)) client.setBounds({height: height});
+        if (this.includeScroller) {
+            var bounds = this.getBounds();
+            var height = bounds.height;
+            var client = this.$.client;
+            if (enyo.exists(client)) client.setBounds({height: height});
+        }
         this.inherited(arguments);
     }
 });
