@@ -39,14 +39,15 @@ enyo.Mixin({
         var controls = this.get("bindableControls");
         if (!controller) return;
         enyo.forEach(controls, function (child) {
-            var prop = child.bindProperty;
+            var prop = child.bindFrom;
             var to = this.getBindTargetFor(child);
             this.autoBinding({
                 source: controller,
                 from: prop,
                 target: child,
-                to: to
-            });
+                to: to,
+                autoSync: false
+            }, this.getTransformsFor(child));
         }, this);
         this.autoBinding({
             source: controller,
@@ -68,10 +69,40 @@ enyo.Mixin({
     // if not get set it to content, if it was set make sure
     // it has the correct format
     getBindTargetFor: function (child) {
-        var to = child.get("bindTarget");
+        var to = child.get("bindTarget") || child.get("bindTo");
         if (!to) to = ".content";
         to = to[0] === "."? to: "." + to;
         return to;
+    },
+    //*@protected
+    /**
+        This is a tricky scenario in which we try to determine the
+        most sane places to look for the designated transform, if any.
+    */
+    getTransformsFor: function (child) {
+        var props = {};
+        var fn;
+        var context = this.owner;
+        var controller = context.controller;
+        if (child.transform || child.bindTransform) {
+            props.transform = child.transform || child.bindTransform;
+            if ("string" === typeof props.transform) {
+                if ((fn = child[props.transform]) && "function" === typeof fn) {
+                    props.owner = child;
+                } else if ((fn = context[props.transform]) && "function" === typeof fn) {
+                    props.owner = context;
+                } else if (controller) {
+                    if ((fn = controller[props.transform]) && "function" === typeof fn) {
+                        props.owner = controller;
+                    } else if ((controller = child.controller)) {
+                        if ((fn = controller[props.transform]) && "function" === typeof fn) {
+                            props.owner = controller;
+                        }
+                    }
+                }
+            }
+        }
+        return props;
     },
     // this is the function that essentially wraps the default
     // binding method on object, add the isAutoBinding boolean
@@ -83,7 +114,7 @@ enyo.Mixin({
     // computed property that will return the array of auto bindings
     // for this view
     autoBindings: enyo.Computed(function () {
-        return enyo.filter(this._bindings, function (binding) {
+        return enyo.filter(this.bindings, function (binding) {
             return binding.isAutoBinding === true;
         });
     }),
@@ -131,7 +162,11 @@ enyo.Mixin({
         fn = enyo.bind(this, this.findBindableControls);
         enyo.forEach(controls, function (control) {
             ret = ret.concat(fn(control.controls || []));
-            if (control.bindProperty) ret.push(control);  
+            if (control.bindProperty || control.bindFrom) {
+                if (control.bindProperty) control.bindFrom = control.bindProperty;
+                if (control.bindTarget) control.bindTo = control.bindTarget;
+                ret.push(control);  
+            }
         });
         return ret;
     }
