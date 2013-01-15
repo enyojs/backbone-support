@@ -46,7 +46,8 @@ enyo.Mixin({
                 from: prop,
                 target: child,
                 to: to,
-                autoSync: false
+                autoSync: false,
+                oneWay: false === child.bindOneWay? false: true
             }, this.getTransformsFor(child));
         }, this);
         this.autoBinding({
