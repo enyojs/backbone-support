@@ -46,7 +46,7 @@ enyo.kind({
     */
     data: enyo.Computed(function () {
         return this.get("models");
-    }, "models"),
+    }, "models", "model"),
     //*@protected
     collectionChanged: function () {
         this.findAndInstance("collection", function (ctor, inst) {
@@ -237,6 +237,7 @@ enyo.kind({
     },
     collectionDidChange: function (model) {
         this.dispatchBubble("onmodelchange", {model: model}, this);
+        this.notifyObservers("model", null, model);
     },
     collectionDidAdd: function (model, collection, options) {
         this.stopNotifications();
