@@ -167,10 +167,11 @@ enyo.Mixin({
     // and it forces a reset of selection to anyone listening
     // but...it still seems wrong, leaving it for now
     collectionDidReset: function (collection, options) {
-        var models = options.previousModels || [];
-        enyo.forEach(models, function (model) {
-            model.destroy();
-        });
+        //var models = options.previousModels || [];
+        //enyo.forEach(models, function (model) {
+        //    model.destroy();
+        //});
+        this.deselect();
         this.inherited(arguments);
     },
     selectedModelChanged: function (model) {
