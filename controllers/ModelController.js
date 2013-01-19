@@ -1,25 +1,22 @@
 
-//*@public
-/**
-    The _enyo.ModelController_ kind is designed to proxy
-    data from a single Backbone.Model instance. Views can
-    bind to properties on this controller as if it was the
-    model and those bindings will automatically update as
-    the model is updated or swapped for another model.
-*/
 enyo.kind({
     //*@public
     name: "enyo.ModelController",
     //*@public
-    kind: "enyo.Controller",
+    kind: "enyo.ObjectController",
     //*@public
     model: null,
-    //*@public
-    lastModel: null,
     //*@protected
     statics: {
         modelControllerCount: 0
     },
+    //*@public
+    data: enyo.Computed(function (model) {
+        // null is acceptable for a value of model
+        if (enyo.exists(model)) {
+            this.set("model", model);
+        } else return this.get("model");
+    }, "model"),
     //*@protected
     constructor: function () {
         this.inherited(arguments);
@@ -28,7 +25,6 @@ enyo.kind({
     //*@protected
     create: function () {
         this.inherited(arguments);
-        this.modelChanged();
         enyo.ModelController.modelControllerCount++;
     },
     //*@protected
@@ -47,29 +43,17 @@ enyo.kind({
         if (model) this.initModel(model);
     },
     //*@protected
-    modelChanged: function () {
-        this.findAndInstance("model", function (ctor, inst) {
-            // we will compare the new model against the previous
-            // model if necessary
-            var last = this.lastModel;
-            var model;
-            // if we don't have anything then we were reset but
-            // that means we need to cleanup if we had one already
-            if (!inst) {
-                if (last) this.releaseModel(last);
-                this.lastModel = null;
-            } else {
-                model = inst;
-                this.lastModel = model;
-                if (last) this.releaseModel(last);
-                this.initModel(model);
+    dataFindAndInstance: function (ctor, inst) {
+        if (inst) {
+            if (inst instanceof Backbone.Model) {
+                this.initData(inst);
             }
-            this.notifyAll();
-        });
+        }
     },
     //*@protected
-    initModel: function (model) {
+    initData: function (model) {
         // we need to initialize 
+        var model = model || this.get("data");
         var responders = this.responders;
         var key;
         for (key in responders) {
@@ -77,9 +61,11 @@ enyo.kind({
             // using the backbone api we add our listeners
             model.on(key, responders[key]);
         }
+        this.lastData = model;
     },
     //*@protected
-    releaseModel: function (model) {
+    releaseData: function (model) {
+        var model = model || this.get("model");
         // we need to releaseModel the model from our registered handlers
         var responders = this.responders;
         var key;
@@ -90,6 +76,7 @@ enyo.kind({
         // if we couldn't find one, nothing to do
         if (!model) return;
         for (key in responders) model.off(key, responders[key]);
+        this.lastData = null;
     },
     //*@public
     /**
@@ -134,66 +121,29 @@ enyo.kind({
         enyo.ModelController.modelControllerCount--;
     },
     //*@public
-    get: function (prop) {
-        // we overload this method to first call the method
-        // on the model and if nothing is returned we use our
-        // default
-        var model = this.model;
+    getDataProperty: function (prop) {
+        var data = this.get("data");
         var ret;
-        var path = prop.split(".");
-        if (1 < path.length) {
-            prop = path[0];
+        if (data && enyo.exists((ret = data.get(prop)))) {
+            return ret;
         }
-        path = path.join(".");
-        if (model && prop in model.attributes) {
-            ret = model.get(path);
-            // if it isn't undefined we have to hope that the null
-            // or value came back for a reason
-            if (enyo.exists(ret)) return ret;
-        }
-        // otherwise we simply return our normal getter
-        return this.inherited(arguments);
+        return false;
     },
     //*@public
-    set: function (prop, value) {
-        // we overload this method to first call the method
-        // on the model if it makes sense otherwise we call
-        // our default setter
-        var model = this.model;
-        if (model) {
-            // the only way we're certain we should be using the
-            // models setter is if the `prop` parameter is actually
-            // an object or if the string is on of the known attributes
-            // of the models properties
-            if ("object" === typeof prop || prop in model.attributes) {
-                return model.set(prop, value);
-            }
+    setDataProperty: function (prop, value) {
+        var data = this.get("data");
+        var prev;
+        // the model's _set_ API accepts an object/hash of properties to
+        // set so that is a sure way to know we want to set this on the model
+        // and not the controller - the only other way we can be sure is if
+        // the property exists in the model attributes
+        if (data && ("object" === typeof prop || prop in data.attributes)) {
+            // we don't need to notify anything because the change on the model
+            // will automatically trigger the change for us
+            data.set(prop, value);
+            return true;
         }
-        return this.inherited(arguments);
-    },
-    //*@protected
-    /**
-        This method attempts to find the correct target(s) and
-        notify them of any/all the possible properties to force
-        them to synchronize to the current values.
-    */
-    notifyAll: function () {
-        // we will try and trick our bindings into firing by simply
-        // triggering all of our registered observers since at this
-        // moment it is the only way to be sure we get all bindings
-        // not just our dispatch targets or owner
-        var observers = this.observers;
-        var handlers;
-        var prop;
-        for (prop in observers) {
-            if (!observers.hasOwnProperty(prop)) continue;
-            if (true === this.isAttribute(prop)) continue;
-            handlers = observers[prop];
-            enyo.forEach(handlers, function (fn) {
-                if ("function" === typeof fn) fn();
-            }, this);
-        }
-        this.notifyAttributes();
+        return false;
     },
     //*@public
     /**
@@ -207,9 +157,13 @@ enyo.kind({
         var attributes;
         if (model) {
             attributes = model.attributes;
-            return (prop in attributes);
+            return attributes.hasOwnProperty(prop);
         }
         return false;
+    },
+    //*@protected
+    notifyAll: function () {
+        this.notifyAttributes();
     },
     //*@protected
     /**

@@ -5,7 +5,7 @@
     It only stores the selected index and not a reference to the object.
 */
 enyo.Mixin({
-    name: "enyo.SelectionSupportMixin",
+    name: "enyo.SelectionSupport",
     /**
         Set this to true to enable multiple selection, it is false
         by default.

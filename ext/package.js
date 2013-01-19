@@ -1,6 +1,4 @@
 enyo.depends(
-  "CollectionRowMixin.js",
-  "SelectionSupportMixin.js",
-  "CollectionRowControllerMixin.js",
-  "CommonCollectionViewMixin.js"
+    "SelectionSupport.js",
+    "AutoBindingSupport.js"
 );

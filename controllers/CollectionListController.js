@@ -33,19 +33,19 @@ enyo.kind({
     bindings: [
         // we keep a local copy of the targets that the view
         // already determined were the correct row components
-        {from: "owner.targets", to: "targets"},
+        {from: ".owner.targets", to: ".targets"},
         // we create this binding such that the owner/list's count
         // is always current
-        {from: "length", to: "owner.count"}
+        {from: ".length", to: ".owner.count"}
     ],
     /**
         If the collection was reset then the entire
         list needs to re-render.
     */
-    didReset: function () {
-        if (!this.owner) return;
-        this.owner.reset();
-    },
+    //didReset: function () {
+    //    if (!this.owner) return;
+    //    this.owner.reset();
+    //},
     /**
         This is a named handler coming from the collection
         for events on individual models.
@@ -66,7 +66,7 @@ enyo.kind({
     lengthChanged: function () {
         var owner = this.owner;
         var len = this.length;
-        if (len && enyo.exists(owner)) owner.refresh();
+        if (len && owner) owner.refresh();
     },
     /**
         Set up the rows auto bindings if they exist.
