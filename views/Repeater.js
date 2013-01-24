@@ -1,21 +1,25 @@
 enyo.kind({
-    name: "mvc.Repeater",
+    name: "wip.Repeater",
+    
     kind: "enyo.View",
+    
     //*@public
     defaultRowController: "enyo.ObjectController",
+    
     //*@public
     childMixins: ["enyo.AutoBindingSupport"],
+    
     //*@protected
     concat: "childMixins",
+    
     //*@protected
     handlers: {
         didadd: "didAdd",
         didremove: "didRemove",
         didreset: "didReset",
-        didchange: "didChange",
-        didmove: "didMove",
-        didswap: "didSwap"
+        didchange: "didChange"
     },
+    
     //*@public
     /**
         A computed property that represents the length of the
@@ -26,6 +30,7 @@ enyo.kind({
     length: enyo.Computed(function () {
         return (this.get("data") || []).length;
     }, "data"),
+    
     //*@public
     /**
         A computed property that can be overloaded for special
@@ -34,18 +39,12 @@ enyo.kind({
     data: enyo.Computed(function () {
         return this.get("controller.data") || [];
     }),
-    //*@protected
-    /**
-        Initializes the children array.
-    */
-    constructor: function () {
-        this.children = this.children || [];
-        return this.inherited(arguments);
-    },
+    
     create: function () {
         this.inherited(arguments);
         this.sync();
     },
+    
     //*@protected
     initComponents: function () {
         // we intercept the original components definition to hyjack
@@ -77,37 +76,33 @@ enyo.kind({
         // kind components (if they weren't already)
         this.child = enyo.kind(def);
     },
+    
     //*@protected
     /**
         Whenever a new value is added to the dataset we receive this
         event. Because it is an addition we know we'll be adding a
         child or some children (depending on how many elements were added).
         This allows us find and render only the new elements and when
-        necessary rerender any changed indeces only.
+        necessary rerender any changed indices only.
     */
     didAdd: function (sender, event) {
-        var multi = event.multiple;
-        var value = event.value;
-        var idx = event.index;
-        if (multi) {
-            for (idx in value) {
-                this.update(idx);
-            }
-        } else this.update(idx);
-    },
-    //*@protected
-    didRemove: function (sender, event) {
-        var multi = event.multiple;
-        var value = event.value;
-        var idx = event.index;
-        if (multi) {
-            idx = enyo.keys(value).shift();
-        }
-        this.sync(idx);
-        this.log("done");
-        this.prune();
+        this.log(event);
+        var values = event.values;
+        var indices = enyo.keys(values);
+        var idx = 0;
+        var len = indices.length;
+        for (; idx < len; ++idx) this.update(indices[idx]);
     },
     
+    //*@protected
+    didRemove: function (sender, event) {
+        this.log(event);
+        var values = event.values;
+        var indices = enyo.keys(values);
+        var idx = 0;
+        var len = indices.length;
+        for (; idx < len; ++idx) this.sync(indices[idx]);
+    },
     
     prune: function () {
         var children = this.children;
@@ -120,13 +115,16 @@ enyo.kind({
     
     //*@protected
     sync: function (start, end) {
+        this.log(start, end);
         var idx = start || 0;
         var fin = end || this.get("length")-1;
         var data = this.get("data");
         for (; idx <= fin; ++idx) this.update(idx, data);
     },
+    
     //*@protected
     update: function (index, data) {
+        this.log(index, data);
         var children = this.children;
         var data = data? data.length? data[index]: data: this.get("data")[index];
         var child = children[index];
@@ -140,12 +138,15 @@ enyo.kind({
             child.controller.set("data", data);
         }
     },
+    
     //*@protected
     remove: function (index) {
         this.log(index);
     },
+    
     //*@protected
     add: function (index, data) {
+        this.log(index, data);
         var children = this.children;
         var pos = children.length;
         var data = data || this.get("data")[index];
@@ -158,26 +159,23 @@ enyo.kind({
         child.controller.set("data", data);
         child.render();
     },
+    
     //*@protected
     didChange: function (sender, event) {
-        var idx = event.index;
-        var prop = event.path;
-        var child = this.children[idx];
-        var prev = event.previous;
-        var cur = event.current;
-        child.controller.notifyObservers(prop, prev, cur);
-    },
-    //*@protected
-    didMove: function (sender, event) {
-        var from = event.from > event.to? event.to: event.from;
-        var to = from === event.to? event.from: event.to;
-        this.sync(from, to);
-    },
-    //*@protected
-    didSwap: function (sender, event) {
-        var from = event.from;
-        var to = event.to;
-        this.update(from);
-        this.update(to);
+        this.log(event);
+        var values = event.values;
+        var indices = enyo.keys(values);
+        var idx;
+        var len = indices.length;
+        var children = this.children;
+        var child;
+        var pos = 0;
+        for (; pos < len; ++pos) {
+            idx = indices[pos];
+            child = children[idx];
+            if (!child) continue;
+            child.controller.sync(values[idx]);
+        }
     }
+    
 });
