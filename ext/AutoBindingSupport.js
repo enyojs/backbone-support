@@ -55,7 +55,7 @@
         },
         //*@protected
         bindProperties: function (control) {
-            return enyo.mixin(enyo.remap(remapped, control), defaults);
+            return enyo.mixin(enyo.clone(defaults), enyo.remap(remapped, control));
         },
         //*@protected
         bindableControls: enyo.Computed(function (control) {
