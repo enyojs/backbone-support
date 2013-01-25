@@ -237,24 +237,36 @@ enyo.kind({
     
     //*@protected
     collectionDidRemove: function (model, collection, options) {
+        var changeset = {removed: {}, changed: {}};
+        var idx = options.index;
+        var len = collection.length;
+        changeset.removed[idx] = model;
+        for (idx+=1; idx < len; ++idx) changeset.changed[idx] = collection.models[idx];
         this.stopNotifications();
         this.set("length", collection.length);
         this.set("models", collection.models, true);
         this.startNotifications();
-        this.dispatchBubble("didremove", {value: model}, this);
+        this.dispatchBubble("didremove", {values: changeset.removed}, this);
+        if (idx > options.index) {
+            this.dispatchBubble("didchange", {values: changeset.changed}, this);
+        }
     },
     
     //*@protected
     collectionDidDestroy: function (model, collection, options) {
+        var changeset = {};
+        var idx = options.index;
+        changeset[idx] = model;
         this.stopNotifications();
         this.set("length", collection.length);
         this.set("models", collection.models, true);
         this.startNotifications();
-        this.dispatchBubble("diddestroy", {value: model}, this);
+        this.dispatchBubble("diddestroy", {values: changeset}, this);
     },
     
     //*@protected
     collectionDidReset: function (collection, options) {
+        options.values = options.previousModels || [];
         this.stopNotifications();
         this.set("length", collection.length);
         this.set("models", collection.models, true);
