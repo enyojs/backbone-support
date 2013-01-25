@@ -11,12 +11,11 @@ enyo.kind({
         modelControllerCount: 0
     },
     //*@public
-    data: enyo.Computed(function (model) {
-        // null is acceptable for a value of model
+    model: enyo.Computed(function (model) {
         if (enyo.exists(model)) {
-            this.set("model", model);
-        } else return this.get("model");
-    }, "model"),
+            this.data = model;
+        } else return this.get("data");
+    }, "data"),
     //*@protected
     constructor: function () {
         this.inherited(arguments);
@@ -33,14 +32,14 @@ enyo.kind({
         // we can cleanly remove them later when we need to release
         // the model
         var responders = this.responders || (this.responders = {});
-        var model = this.model;
+        var model = this.get("data");
         if (model && responders.change && responders.destroy)
-            this.releaseModel(model);
+            this.releaseData(model);
         // these methods will respond to the `change` and `destroy`
         // events of the underlying model (if any)
         responders["change"] = enyo.bind(this, this.didUpdate);
         responders["destroy"] = enyo.bind(this, this.didDestroy);
-        if (model) this.initModel(model);
+        if (model) this.initData(model);
     },
     //*@protected
     dataFindAndInstance: function (ctor, inst) {
@@ -61,22 +60,21 @@ enyo.kind({
             // using the backbone api we add our listeners
             model.on(key, responders[key]);
         }
-        this.lastData = model;
+        this._last = model;
     },
     //*@protected
     releaseData: function (model) {
-        var model = model || this.get("model");
         // we need to releaseModel the model from our registered handlers
         var responders = this.responders;
         var key;
         // will use the parameter first or the `model` property, or
         // the `lastModel` property if the parameter isn't provided
         // and the `model` property is empty
-        model = model || this.model || this.lastModel;
+        model = model || this.get("data") || this._last;
         // if we couldn't find one, nothing to do
         if (!model) return;
         for (key in responders) model.off(key, responders[key]);
-        this.lastData = null;
+        this._last = null;
     },
     //*@public
     /**
@@ -101,20 +99,20 @@ enyo.kind({
     */
     didDestroy: function () {
         // turns out this is pretty easy
-        this.releaseModel();
-        this.model = null;
+        this.releaseData();
         // the current model will have also been the reference
         // to our `lastModel` so we clear that as well
-        this.lastModel = null;
-        this.modelChanged();
+        this._last = null;
+        this.set("data", null);
     },
     //*@protected
     destroy: function () {
         // we want to releaseModel our references to the models and
         // free them of our observers is possible
-        this.releaseModel();
-        this.model = null;
-        this.lastModel = null;
+        this.releaseData();
+        this.stopNotifications(true);
+        this.set("data", null);
+        this.startNotifications(true);
         // inherited
         this.inherited(arguments);
         // decrement our counter
@@ -153,7 +151,7 @@ enyo.kind({
         false.
     */
     isAttribute: function (prop) {
-        var model = this.model
+        var model = this.get("data");
         var attributes;
         if (model) {
             attributes = model.attributes;
@@ -171,7 +169,7 @@ enyo.kind({
         trigger responders.
     */
     notifyAttributes: function () {
-        var model = this.model;
+        var model = this.get("data");
         var attributes;
         var prop;
         if (model) {
