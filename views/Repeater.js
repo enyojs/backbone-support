@@ -67,7 +67,7 @@ enyo.kind({
     
     //*@public
     sync: function (start, end) {
-        this.log(start, end);
+        this.log();
         var idx = start || 0;
         var fin = end || this.get("length")-1;
         var data = this.get("data");
@@ -76,7 +76,7 @@ enyo.kind({
     
     //*@public
     update: function (index, data) {
-        this.log(index, data);
+        this.log();
         index = parseInt(index);
         var children = this.children;
         var data = data? data.length? data[index]: data: this.get("data")[index];
@@ -99,7 +99,7 @@ enyo.kind({
     
     //*@protected
     add: function (index, data) {
-        this.log(index, data);
+        this.log();
         var children = this.children;
         var pos = children.length;
         var data = data || this.get("data")[index];
@@ -163,7 +163,7 @@ enyo.kind({
         necessary rerender any changed indices only.
     */
     didAdd: function (sender, event) {
-        this.log(event);
+        this.log();
         var values = event.values;
         var indices = enyo.keys(values);
         var pos = 0;
@@ -180,9 +180,15 @@ enyo.kind({
         this.log(event);
         var values = event.values;
         var indices = enyo.keys(values);
-        var idx = 0;
         var len = indices.length;
-        for (; idx < len; ++idx) this.sync(indices[idx]);
+        var pos = 0;
+        var data = this.get("data");
+        var idx;
+        for (; pos < len; ++pos) {
+            idx = indices[pos];
+            this.update(idx, data[idx]);
+        }
+        this.prune();
     },
     
     //*@protected
@@ -199,8 +205,15 @@ enyo.kind({
             idx = indices[pos];
             child = children[idx];
             if (!child) continue;
-            child.controller.sync();
+            child.controller.set("data", values[idx]);
         }
+    },
+    
+    //*@protected
+    didReset: function (sender, event) {
+        this.log(event);
+        this.sync();
+        this.prune();
     }
     
 });
