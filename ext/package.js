@@ -1,4 +1,5 @@
 enyo.depends(
     "SelectionSupport.js",
-    "AutoBindingSupport.js"
+    "AutoBindingSupport.js",
+    "CollectionArraySupport.js"
 );

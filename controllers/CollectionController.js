@@ -1,33 +1,42 @@
 
 //*@public
 /**
-    The _enyo.CollectionController_ kind is designed to help proxy
-    a Backbone.Collection's data to a other enyo objects. It can be
-    used to proxy one collection's data to many other collection
-    controllers (e.g. _enyo.CollectionListController_).
 */
 enyo.kind({
+    
+    // ...........................
+    // PUBLIC PROPERTIES
+    
+    //*@public
     name: "enyo.CollectionController",
+    
+    //*@public
     kind: "enyo.ArrayController",
+    
+    //*@public
     collection: null,
+    
+    //*@public
+    model: null,
+    
+    //*@public
     autoLoad: false,
+    
+    //*@public
     models: null,
+    
+    //*@public
+    mixins: ["enyo.SelectionSupport", "enyo.CollectionArraySupport"],
+    
+    // ...........................
+    // PROTECTED PROPERTIES
+    
     //*@protected
-    lastCollection: null,
-    //*@protected
-    mixins: ["enyo.SelectionSupport"],
-    //*@protected
-    constructor: function () {
-        this.inherited(arguments);
-        this.createResponders();
-    },
-    //*@protected
-    create: function () {
-        this.models = this.models || [];
-        this.inherited(arguments);
-        this.collectionChanged();
-        if (this.get("autoLoad") === true) this.load();
-    },
+    _last_collection: null,
+    
+    // ...........................
+    // COMPUTED PROPERTIES
+
     //*@public
     /**
         Override this computed property to return any filtered
@@ -36,13 +45,64 @@ enyo.kind({
     data: enyo.Computed(function (data) {
         return this.models;
     }, "models", "model"),
+    
+    // ...........................
+    // PUBLIC METHODS
+    
+    //*@public
+    load: function (options) {
+        var col = this.collection;
+        options = options || {};
+        options.success = enyo.bind(this, this.collectionDidLoad);
+        if (!col) return false;
+        else {
+            return col.fetch.call(col, options);
+        }
+    },
+    
+    //*@public
+    fetch: function (options) {
+        return this.load.apply(this, arguments);
+    },
+        
+    //*@public
+    on: function (event, fn) {
+        var col = this.collection;
+        if (!col) return false;
+        else return col.on.apply(col, arguments);
+    },
+    
+    //*@public
+    off: function (event, fn) {
+        var col = this.collection;
+        if (!col) return false;
+        else return col.off.apply(col, arguments);
+    },
+    
+    // ...........................
+    // PROTECTED METHODS
+    
+    //*@protected
+    constructor: function () {
+        this.inherited(arguments);
+        this.createResponders();
+    },
+    
+    //*@protected
+    create: function () {
+        this.inherited(arguments);
+        this.collectionChanged();
+        if (this.get("autoLoad") === true) this.load();
+    },
+
     //*@protected
     collectionChanged: function () {
         this.findAndInstance("collection");
     },
+    
     //*@protected
     collectionFindAndInstance: function (ctor, inst) {
-        var last = this.lastCollection;
+        var last = this._last_collection;
         var model = this.model;
 
         if (!(ctor || inst)) {
@@ -77,7 +137,7 @@ enyo.kind({
         }
             
         if (last) this.releaseCollection(last);
-        this.lastCollection = inst;
+        this._last_collection = inst;
             
         this.stopNotifications();
         this.initCollection(inst);
@@ -98,82 +158,8 @@ enyo.kind({
             this.startNotifications();
         }
     },
-    //*@public
-    /**
-        See _enyo.Collection.fetch_
-    */
-    load: function (options) {
-        var col = this.collection;
-        options = options || {};
-        options.success = enyo.bind(this, this.collectionDidLoad);
-        if (!col) return false;
-        else {
-            return col.fetch.call(col, options);
-        }
-    },
-    /**
-        See _enyo.Collection.fetch_
-    */
-    fetch: function (options) {
-        return this.load.apply(this, arguments);
-    },
-    /**
-        See _enyo.Collection.reset_
-    */
-    reset: function (models, options) {
-        var col = this.collection;
-        if (!col) return false;
-        else return col.reset.apply(col, arguments);
-    },
-    /**
-        See _enyo.Collection.add_
-    */
-    add: function (model, options) {
-        var col = this.collection;
-        if (!col) return false;
-        else return col.add.apply(col, arguments);
-    },
-    /**
-        See _enyo.Collection.remove_
-    */
-    remove: function (model, options) {
-        var col = this.collection;
-        if (!col) return false;
-        else return col.remove.apply(col, arguments);
-    },
-    /**
-        See _enyo.Collection.at_
-    */
-    at: function (idx) {
-        var col = this.collection;
-        if (!col) return false;
-        else return col.at.apply(col, arguments);
-    },
-    /**
-        See _enyo.Collection.indexOf_
-    */
-    indexOf: function (model) {
-        var col = this.collection;
-        if (!col) return false;
-        else return col.indexOf.apply(col, arguments);
-    },
-    
-    on: function (event, fn) {
-        var col = this.collection;
-        if (!col) return false;
-        else return col.on.apply(col, arguments);
-    },
-    
-    off: function (event, fn) {
-        var col = this.collection;
-        if (!col) return false;
-        else return col.off.apply(col, arguments);
-    },
     
     //*@protected
-    /**
-        If the owner is changed we need to update accordingly.
-    */
     ownerChanged: function () {
         if (!this.collection) this.collectionChanged();
         if (this.collection && !this.collection.model && this.model) {
@@ -182,6 +168,7 @@ enyo.kind({
         return this.inherited(arguments);
     },
     
+    //*@protected
     createResponders: function () {
         // we want to create and store these responders so that
         // we can cleanly remove them later when we need to release
@@ -200,6 +187,7 @@ enyo.kind({
         if (collection) this.initCollection(collection);
     },
     
+    //*@protected
     releaseCollection: function (collection) {
         var responders = this.responders;
         var key;
@@ -208,6 +196,7 @@ enyo.kind({
         for (key in responders) collection.off(key, responders[key]);  
     },
     
+    //*@protected
     initCollection: function (collection) {
         // we need to initialize 
         var responders = this.responders;
@@ -222,20 +211,31 @@ enyo.kind({
         this.set("models", collection.models, true);
         this.startNotifications();
     },
+    
+    //*@protected
     collectionDidLoad: function () {
         this.dispatchBubble("oncollectionloaded", {}, this);
     },
+    
+    //*@protected
     collectionDidChange: function (model) {
         this.dispatchBubble("didchange", {model: model}, this);
         this.notifyObservers("model", null, model);
     },
+    
+    //*@protected
     collectionDidAdd: function (model, collection, options) {
+        var changeset = {};
+        var idx = this.indexOf(model);
+        changeset[idx] = model;
         this.stopNotifications();
         this.set("length", collection.length);
         this.set("models", collection.models, true);
         this.startNotifications();
-        this.dispatchBubble("didadd", {value: model}, this);
+        this.dispatchBubble("didadd", {values: changeset}, this);
     },
+    
+    //*@protected
     collectionDidRemove: function (model, collection, options) {
         this.stopNotifications();
         this.set("length", collection.length);
@@ -243,6 +243,8 @@ enyo.kind({
         this.startNotifications();
         this.dispatchBubble("didremove", {value: model}, this);
     },
+    
+    //*@protected
     collectionDidDestroy: function (model, collection, options) {
         this.stopNotifications();
         this.set("length", collection.length);
@@ -250,6 +252,8 @@ enyo.kind({
         this.startNotifications();
         this.dispatchBubble("diddestroy", {value: model}, this);
     },
+    
+    //*@protected
     collectionDidReset: function (collection, options) {
         this.stopNotifications();
         this.set("length", collection.length);
@@ -258,13 +262,15 @@ enyo.kind({
         this.dispatchBubble("didreset", options, this);
     },
     
+    //*@protected
     destroy: function () {
-        var last = this.lastCollection;
+        var last = this._last_collection;
         if (last) this.releaseCollection(last);
-        this.lastCollection = null;
+        this._last_collection = null;
         this.collection = null;
         this.responders = null;
         this.model = null;
         this.inherited(arguments);
     }
-})
+    
+});

@@ -1,13 +1,22 @@
 enyo.kind({
+    
+    // ...........................
+    // PUBLIC PROPERTIES
+
+    //*@public
     name: "wip.Repeater",
     
+    //*@public
     kind: "enyo.View",
     
     //*@public
-    defaultRowController: "enyo.ObjectController",
+    defaultChildController: "enyo.ObjectController",
     
     //*@public
     childMixins: ["enyo.AutoBindingSupport"],
+    
+    // ...........................
+    // PROTECTED PROPERTIES
     
     //*@protected
     concat: "childMixins",
@@ -19,6 +28,9 @@ enyo.kind({
         didreset: "didReset",
         didchange: "didChange"
     },
+    
+    // ...........................
+    // COMPUTED PROPERTIES
     
     //*@public
     /**
@@ -40,6 +52,71 @@ enyo.kind({
         return this.get("controller.data") || [];
     }),
     
+    // ...........................
+    // PUBLIC METHODS
+    
+    //*@public
+    prune: function () {
+        var children = this.children;
+        var len = this.get("length");
+        var idx = 0;
+        var blackbook = children.slice(len);
+        var count = blackbook.length;
+        for (; idx < count; ++idx) blackbook[idx].destroy();
+    },
+    
+    //*@public
+    sync: function (start, end) {
+        this.log(start, end);
+        var idx = start || 0;
+        var fin = end || this.get("length")-1;
+        var data = this.get("data");
+        for (; idx <= fin; ++idx) this.update(idx, data);
+    },
+    
+    //*@public
+    update: function (index, data) {
+        this.log(index, data);
+        index = parseInt(index);
+        var children = this.children;
+        var data = data? data.length? data[index]: data: this.get("data")[index];
+        var child = children[index];
+        var len = this.get("length");
+        if (index < 0 || index >= len) return;
+        if (!data && child) {
+            this.remove(index);
+        } else if (data && !child) {
+            this.add(index, data);
+        } else if (data && child) {
+            child.controller.set("data", data);
+        }
+    },
+    
+    //*@public
+    remove: function (index) {
+        this.log(index);
+    },
+    
+    //*@protected
+    add: function (index, data) {
+        this.log(index, data);
+        var children = this.children;
+        var pos = children.length;
+        var data = data || this.get("data")[index];
+        var kind = this.child;
+        var child;
+        if (pos !== index) {
+            throw "add was called for index other than the end";
+        }
+        child = this.createComponent({kind: kind});
+        child.controller.set("data", data);
+        child.render();
+    },
+    
+    // ...........................
+    // PROTECTED METHODS
+    
+    //*@protected
     create: function () {
         this.inherited(arguments);
         this.sync();
@@ -61,7 +138,7 @@ enyo.kind({
         def.mixins = enyo.merge(mixins, this.childMixins);
         // if the definition for the child does not have a controller set
         // we apply our default
-        if (!def.controller) def.controller = this.defaultRowController;
+        if (!def.controller) def.controller = this.defaultChildController;
         // we reset whichever of these was going to be used (or both)
         // so we don't actually create any children/controls at this time
         this.kindComponents = this.components = null;
@@ -89,9 +166,13 @@ enyo.kind({
         this.log(event);
         var values = event.values;
         var indices = enyo.keys(values);
-        var idx = 0;
+        var pos = 0;
         var len = indices.length;
-        for (; idx < len; ++idx) this.update(indices[idx]);
+        var idx;
+        for (; pos < len; ++pos) {
+            idx = indices[pos];
+            this.update(idx, values[idx]);
+        }
     },
     
     //*@protected
@@ -102,62 +183,6 @@ enyo.kind({
         var idx = 0;
         var len = indices.length;
         for (; idx < len; ++idx) this.sync(indices[idx]);
-    },
-    
-    prune: function () {
-        var children = this.children;
-        var len = this.get("length");
-        var idx = 0;
-        var blackbook = children.slice(len);
-        var count = blackbook.length;
-        for (; idx < count; ++idx) blackbook[idx].destroy();
-    },
-    
-    //*@protected
-    sync: function (start, end) {
-        this.log(start, end);
-        var idx = start || 0;
-        var fin = end || this.get("length")-1;
-        var data = this.get("data");
-        for (; idx <= fin; ++idx) this.update(idx, data);
-    },
-    
-    //*@protected
-    update: function (index, data) {
-        this.log(index, data);
-        var children = this.children;
-        var data = data? data.length? data[index]: data: this.get("data")[index];
-        var child = children[index];
-        var len = this.get("length");
-        if (index < 0 || index >= len) return;
-        if (!data && child) {
-            this.remove(index);
-        } else if (data && !child) {
-            this.add(index, data);
-        } else if (data && child) {
-            child.controller.set("data", data);
-        }
-    },
-    
-    //*@protected
-    remove: function (index) {
-        this.log(index);
-    },
-    
-    //*@protected
-    add: function (index, data) {
-        this.log(index, data);
-        var children = this.children;
-        var pos = children.length;
-        var data = data || this.get("data")[index];
-        var kind = this.child;
-        var child;
-        if (pos !== index) {
-            throw "add was called for index other than the end";
-        }
-        child = this.createComponent({kind: kind});
-        child.controller.set("data", data);
-        child.render();
     },
     
     //*@protected
@@ -174,7 +199,7 @@ enyo.kind({
             idx = indices[pos];
             child = children[idx];
             if (!child) continue;
-            child.controller.sync(values[idx]);
+            child.controller.sync();
         }
     }
     
