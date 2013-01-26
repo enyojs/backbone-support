@@ -23,11 +23,16 @@ enyo.kind({
     
     //*@protected
     handlers: {
-        didadd: "didAdd",
-        didremove: "didRemove",
-        didreset: "didReset",
-        didchange: "didChange"
+        didadd: "repeaterDidAdd",
+        didremove: "repeaterDidRemove",
+        didreset: "repeaterDidReset",
+        didchange: "repeaterDidChange"
     },
+    
+    //*@protected
+    bindings: [
+        {from: ".controller.data", to: ".data"}
+    ],
     
     // ...........................
     // COMPUTED PROPERTIES
@@ -42,15 +47,6 @@ enyo.kind({
     length: enyo.Computed(function () {
         return (this.get("data") || []).length;
     }, "data"),
-    
-    //*@public
-    /**
-        A computed property that can be overloaded for special
-        behaviors (e.g. filtered dataset).
-    */
-    data: enyo.Computed(function () {
-        return this.get("controller.data") || [];
-    }),
     
     // ...........................
     // PUBLIC METHODS
@@ -67,7 +63,6 @@ enyo.kind({
     
     //*@public
     sync: function (start, end) {
-        this.log();
         var idx = start || 0;
         var fin = end || this.get("length")-1;
         var data = this.get("data");
@@ -76,7 +71,6 @@ enyo.kind({
     
     //*@public
     update: function (index, data) {
-        this.log();
         index = parseInt(index);
         var children = this.children;
         var data = data? data.length? data[index]: data: this.get("data")[index];
@@ -99,7 +93,6 @@ enyo.kind({
     
     //*@protected
     add: function (index, data) {
-        this.log();
         var children = this.children;
         var pos = children.length;
         var data = data || this.get("data")[index];
@@ -136,9 +129,6 @@ enyo.kind({
         // now we add the auto-bindings support mixin so it will always
         // be applied to our children
         def.mixins = enyo.merge(mixins, this.childMixins);
-        // if the definition for the child does not have a controller set
-        // we apply our default
-        if (!def.controller) def.controller = this.defaultChildController;
         // we reset whichever of these was going to be used (or both)
         // so we don't actually create any children/controls at this time
         this.kindComponents = this.components = null;
@@ -152,6 +142,11 @@ enyo.kind({
         // this is where the components on the child definition become
         // kind components (if they weren't already)
         this.child = enyo.kind(def);
+        // if the definition for the child does not have a controller set
+        // we apply our default
+        if (!this.child.prototype.controller) {
+            this.child.prototype.controller = this.defaultChildController;
+        }
     },
     
     //*@protected
@@ -162,8 +157,7 @@ enyo.kind({
         This allows us find and render only the new elements and when
         necessary rerender any changed indices only.
     */
-    didAdd: function (sender, event) {
-        this.log();
+    repeaterDidAdd: function (sender, event) {
         var values = event.values;
         var indices = enyo.keys(values);
         var pos = 0;
@@ -176,8 +170,7 @@ enyo.kind({
     },
     
     //*@protected
-    didRemove: function (sender, event) {
-        this.log(event);
+    repeaterDidRemove: function (sender, event) {
         var values = event.values;
         var indices = enyo.keys(values);
         var len = indices.length;
@@ -192,8 +185,7 @@ enyo.kind({
     },
     
     //*@protected
-    didChange: function (sender, event) {
-        this.log(event);
+    repeaterDidChange: function (sender, event) {
         var values = event.values;
         var indices = enyo.keys(values);
         var idx;
@@ -210,10 +202,12 @@ enyo.kind({
     },
     
     //*@protected
-    didReset: function (sender, event) {
-        this.log(event);
+    repeaterDidReset: function (sender, event) {
         this.sync();
         this.prune();
-    }
+    },
+    
+    // ...........................
+    // OBSERVERS
     
 });
