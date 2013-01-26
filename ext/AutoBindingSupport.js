@@ -5,14 +5,16 @@
         bindTo: "to",
         bindTransform: "transform",
         bindOneWay: "onWay",
-        bindAutoSync: "autoSync"
+        bindAutoSync: "autoSync",
+        bindDebug: "debug"
     };
     
     var defaults = {
         to: ".content",
         transform: null,
         oneWay: true,
-        autoSync: false
+        autoSync: false,
+        debug: false
     };
     
     enyo.Mixin({
