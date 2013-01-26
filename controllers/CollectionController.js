@@ -214,12 +214,15 @@ enyo.kind({
     
     //*@protected
     collectionDidLoad: function () {
-        this.dispatchBubble("oncollectionloaded", {}, this);
+        this.dispatchBubble("didload", {}, this);
     },
     
     //*@protected
     collectionDidChange: function (model) {
-        this.dispatchBubble("didchange", {model: model}, this);
+        var changeset = {};
+        var idx = this.indexOf(model);
+        changeset[idx] = model;
+        this.dispatchBubble("didchange", {values: changeset}, this);
         this.notifyObservers("model", null, model);
     },
     
