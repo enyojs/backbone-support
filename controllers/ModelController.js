@@ -179,5 +179,10 @@ enyo.kind({
                 this.notifyObservers(prop, null, model.get(prop));
             }
         }
-    }
+    },
+    
+    //*@protected
+    dataDidChange: enyo.Observer(function () {
+        this.inherited(arguments);
+    }, "data", "model")
 });
