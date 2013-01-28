@@ -1,31 +1,23 @@
 //*@public
 /**
-    Applied to _enyo.CollectionControllers_ to be able to handle support
-    for selection. It can manage multiselect and single-select implementations.
-    It only stores the selected index and not a reference to the object.
 */
 enyo.Mixin({
+    
+    //*@public
     name: "enyo.SelectionSupport",
-    /**
-        Set this to true to enable multiple selection, it is false
-        by default.
-    */
+    
+    //*@public
     multiselect: false,
-    /**
-        If a record is selected, this property will be a reference
-        to the model, if multiselect is enabled, this will be an
-        array controller of any selected models.
-    */
+    
+    //*@public
     selection: null,
+    
+    //*@protected
     initMixin: function () {
-        // register for when our owner is set to determine
-        // if our multiselect status changes
-        this.addObserver("owner", this.mixinOwnerChanged, this);
         if (this.createResponders) this.createResponders();
-        //this.addObserver("collection", this.mixinCollectionChanged, this);
-        //handlers["onmodelchange"] = "selectedModelChanged";
-        //handlers["onSelectedChanged"] = "selectedModelChanged";
     },
+    
+    //@*protected
     collectionDidChange: function (model) {
         var changed = model.changedAttributes() || {};
         if ("selected" in changed) {
@@ -33,14 +25,8 @@ enyo.Mixin({
         }
         return this.inherited(arguments);
     },
-    /**
-        To select a record pass in an index or a reference to the
-        model. If multiselect is true, the index of the model will 
-        be added to the selection array controller. If multiselect 
-        is false, the previously selected model (if any) will be 
-        deselected and the new model will be selected
-        and its reference placed in the selection property.
-    */
+    
+    //*@public
     select: function (model) {
         var idx;
         if ("number" === typeof model) {
@@ -75,16 +61,8 @@ enyo.Mixin({
         }
         this.notifyObservers("selection", null, this.selection);
     },
-    /**
-        Deselect a model by passing the model reference in or an index
-        to it. If multiselect is true, the models index will be removed
-        from the selection array and have its selected state set to false. 
-        If only single selection is permitted, and the model is the currently
-        selected model (either by index or model reference) it will be 
-        deselected. If deselect is called without passing in an index or 
-        model reference it will automatically deselect the currently selected
-        model if only single-selection is enabled. Otherwise it will to nothing.
-    */
+    
+    //*@public
     deselect: function (model) {
         //  grab our current selection
         var selection = this.selection;
@@ -147,33 +125,14 @@ enyo.Mixin({
             this.notifyObservers("selection", null, this.selection);
         }
     },
-    mixinOwnerChanged: function () {
-        var owner = this.owner;
-        if (owner) {
-            this.set("multiselect", owner.multiselect);
-        }
-    },
+    
     //*@protected
-    multiselectChanged: function () {
-        if (this.multiselect === true) {
-            if (!this.selection) {
-                this.selection = new enyo.ArrayController();
-            }
-        }
-    },
-    // this is terribly questionable to let every potential
-    // collection controller attempt to do this - it appears
-    // safe because its a nop if the model is already destroyed
-    // and it forces a reset of selection to anyone listening
-    // but...it still seems wrong, leaving it for now
     collectionDidReset: function (collection, options) {
-        //var models = options.previousModels || [];
-        //enyo.forEach(models, function (model) {
-        //    model.destroy();
-        //});
         this.deselect();
         this.inherited(arguments);
     },
+    
+    //*@protected
     selectedModelChanged: function (model) {
         var selected = model.get("selected");
         var multi = this.multiselect;
@@ -193,20 +152,20 @@ enyo.Mixin({
         }
         return true;
     },
+    
+    //*@protected
     // TODO: need to add support for multiselect that when a model
     // is added to the selection set it has its index stored on the object
     // so in cases like these when we can't match it in the collection we
     // can still remove it from the selection set!
-    modelRemoved: function (sender, event) {
-        var model = event.model;
-        var selection = this.selection;
-        var multi = this.multiselect;
-        if (multi) return false; // don't support this yet
-        if (selection && model === selection) {
-            this.deselect(model);
+    collectionDidRemove: function (model, collection, options) {
+        if (this.selection && this.selection === model) {
+            this.deselect();
         }
+        this.inherited(arguments);
     },
     
+    //*@protected
     releaseCollection: function (collection) {
         var multi = this.multiselect;
         if (true === multi) {
@@ -214,4 +173,5 @@ enyo.Mixin({
         } else this.deselect();
         this.inherited(arguments);
     }
+    
 });

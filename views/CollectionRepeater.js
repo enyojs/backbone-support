@@ -23,18 +23,6 @@ enyo.kind({
     // PROTECTED PROPERTIES
     
     //*@protected
-    defaultChildController: "enyo.ModelController",
-
-    // ...........................
-    // COMPUTED PROPERTIES
-    
-    // ...........................
-    // PUBLIC METHODS
-    
-    // ...........................
-    // PROTECTED METHODS
-    
-    // ...........................
-    // OBSERVERS
+    defaultChildController: "enyo.ModelController"
     
 });
