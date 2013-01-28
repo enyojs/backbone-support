@@ -4,7 +4,7 @@
         bindFrom: "from",
         bindTo: "to",
         bindTransform: "transform",
-        bindOneWay: "onWay",
+        bindOneWay: "oneWay",
         bindAutoSync: "autoSync",
         bindDebug: "debug"
     };
