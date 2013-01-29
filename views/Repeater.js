@@ -121,8 +121,11 @@ enyo.kind({
         // the normal flow of initializing components
         var components = this.kindComponents || this.components || [];
         // we try and retrieve the definition/configuration for the child
-        // component/view we will need to use in the repeater
-        var def = components[0];
+        // component/view we will need to use in the repeater, if there are
+        // multiple children we combine them into a wrapper view
+        var def = (function (children) {
+            return children.length > 1? {components: children}: children[0];
+        }(components));
         // we grab a reference to any mixins the definition might have
         // so we can add the one we know needs to be there
         var mixins = def.mixins || [];
