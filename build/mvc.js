@@ -7714,7 +7714,11 @@ create: function() {
 this.inherited(arguments), this.sync();
 },
 initComponents: function() {
-var e = this.kindComponents || this.components || [], t = e[0], n = t.mixins || [];
+var e = this.kindComponents || this.components || [], t = function(e) {
+return e.length > 1 ? {
+components: e
+} : e[0];
+}(e), n = t.mixins || [];
 t.mixins = enyo.merge(n, this.childMixins), this.kindComponents = this.components = null, this.inherited(arguments), delete t.name, this.child = enyo.kind(t), this.child.prototype.controller || (this.child.prototype.controller = this.defaultChildController);
 },
 repeaterDidAdd: function(e, t) {
