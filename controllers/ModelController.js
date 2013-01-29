@@ -55,6 +55,7 @@ enyo.kind({
         var model = model || this.get("data");
         var responders = this.responders;
         var key;
+        if (!model) return;
         for (key in responders) {
             if (!responders.hasOwnProperty(key)) continue;
             // using the backbone api we add our listeners
