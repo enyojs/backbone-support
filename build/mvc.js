@@ -5014,6 +5014,8 @@ toggleSelected: !1,
 fixedHeight: !1,
 reorderable: !1,
 centerReorderContainer: !0,
+reorderComponents: [],
+pinnedReorderComponents: [],
 swipeableComponents: [],
 enableSwipe: !1,
 persistSwipeableItem: !1
@@ -5050,6 +5052,10 @@ tag: null,
 name: "client"
 } ]
 }, {
+name: "holdingarea",
+allowHtml: !0,
+classes: "enyo-list-holdingarea"
+}, {
 name: "page0",
 allowHtml: !0,
 classes: "enyo-list-page"
@@ -5058,15 +5064,15 @@ name: "page1",
 allowHtml: !0,
 classes: "enyo-list-page"
 }, {
-name: "placeholder",
-classes: "enyo-list-placeholder"
+name: "placeholder"
 }, {
 name: "swipeableComponents",
-style: "position:absolute; display:block; top:-1000px; left:0px;"
+style: "position:absolute; display:block; top:-1000px; left:0;"
 } ]
 } ],
 reorderHoldTimeMS: 600,
 draggingRowIndex: -1,
+draggingRowNode: null,
 placeholderRowIndex: -1,
 dragToScrollThreshold: .1,
 prevScrollTop: 0,
@@ -5089,7 +5095,7 @@ normalSwipeSpeedMS: 200,
 fastSwipeSpeedMS: 100,
 percentageDraggedThreshold: .2,
 importProps: function(e) {
-e.reorderable && (this.touch = !0), this.inherited(arguments);
+e && e.reorderable && (this.touch = !0), this.inherited(arguments);
 },
 create: function() {
 this.pageHeights = [], this.inherited(arguments), this.getStrategy().translateOptimized = !0, this.bottomUpChanged(), this.noSelectChanged(), this.multiSelectChanged(), this.toggleSelectedChanged();
@@ -5181,9 +5187,12 @@ this.pageHeights[e] = s, this.portSize += s - o;
 pageForRow: function(e) {
 return Math.floor(e / this.rowsPerPage);
 },
+preserveDraggingRowNode: function(e) {
+this.draggingRowNode && this.pageForRow(this.draggingRowIndex) === e && (this.$.holdingarea.hasNode().appendChild(this.draggingRowNode), this.draggingRowNode = null);
+},
 update: function(e) {
 var t = !1, n = this.positionToPageInfo(e), r = n.pos + this.scrollerHeight / 2, i = Math.floor(r / Math.max(n.height, this.scrollerHeight) + .5) + n.no, s = i % 2 === 0 ? i : i - 1;
-this.p0 != s && this.isPageInRange(s) && (this.generatePage(s, this.$.page0), this.positionPage(s, this.$.page0), this.p0 = s, t = !0, this.p0RowBounds = this.getPageRowHeights(this.$.page0)), s = i % 2 === 0 ? Math.max(1, i - 1) : i, this.p1 != s && this.isPageInRange(s) && (this.generatePage(s, this.$.page1), this.positionPage(s, this.$.page1), this.p1 = s, t = !0, this.p1RowBounds = this.getPageRowHeights(this.$.page1)), t && !this.fixedHeight && (this.adjustBottomPage(), this.adjustPortSize());
+this.p0 != s && this.isPageInRange(s) && (this.preserveDraggingRowNode(this.p0), this.generatePage(s, this.$.page0), this.positionPage(s, this.$.page0), this.p0 = s, t = !0, this.p0RowBounds = this.getPageRowHeights(this.$.page0)), s = i % 2 === 0 ? Math.max(1, i - 1) : i, this.p1 != s && this.isPageInRange(s) && (this.preserveDraggingRowNode(this.p1), this.generatePage(s, this.$.page1), this.positionPage(s, this.$.page1), this.p1 = s, t = !0, this.p1RowBounds = this.getPageRowHeights(this.$.page1)), t && !this.fixedHeight && (this.adjustBottomPage(), this.adjustPortSize());
 },
 getPageRowHeights: function(e) {
 var t = {}, n = e.hasNode().querySelectorAll("div[data-enyo-index]");
@@ -5340,7 +5349,7 @@ shouldStartReordering: function(e, t) {
 return !!this.getReorderable() && t.rowIndex >= 0 && !this.pinnedReorderMode && e === this.$.strategy && t.index >= 0 ? !0 : !1;
 },
 startReordering: function(e) {
-this.$.strategy.listReordering = !0, this.buildReorderContainer(), this.doSetupReorderComponents(e), this.styleReorderContainer(e), this.draggingRowIndex = this.placeholderRowIndex = e.rowIndex, this.itemMoved = !1, this.initialPageNumber = this.currentPageNumber = this.pageForRow(e.rowIndex), this.prevScrollTop = this.getScrollTop(), this.replaceNodeWithPlaceholder(e.rowIndex);
+this.$.strategy.listReordering = !0, this.buildReorderContainer(), this.doSetupReorderComponents(e), this.styleReorderContainer(e), this.draggingRowIndex = this.placeholderRowIndex = e.rowIndex, this.draggingRowNode = e.target, this.itemMoved = !1, this.initialPageNumber = this.currentPageNumber = this.pageForRow(e.rowIndex), this.prevScrollTop = this.getScrollTop(), this.replaceNodeWithPlaceholder(e.rowIndex);
 },
 buildReorderContainer: function() {
 this.$.reorderContainer.destroyClientControls();
@@ -5420,11 +5429,11 @@ this.positionReorderContainer(n, t);
 },
 completeFinishReordering: function(e) {
 this.completeReorderTimeout = null, this.placeholderRowIndex > this.draggingRowIndex && (this.placeholderRowIndex = Math.max(0, this.placeholderRowIndex - 1));
-if (this.draggingRowIndex == this.placeholderRowIndex && !this.pinnedReorderMode && !this.itemMoved) {
+if (this.draggingRowIndex == this.placeholderRowIndex && this.pinnedReorderComponents.length && !this.pinnedReorderMode && !this.itemMoved) {
 this.beginPinnedReorder(e);
 return;
 }
-this.removePlaceholderNode(), this.emptyAndHideReorderContainer(), this.positionReorderedNode(), this.pinnedReorderMode = !1, this.reorderRows(e), this.draggingRowIndex = this.placeholderRowIndex = -1, this.refresh();
+this.removeDraggingRowNode(), this.removePlaceholderNode(), this.emptyAndHideReorderContainer(), this.positionReorderedNode(), this.pinnedReorderMode = !1, this.reorderRows(e), this.draggingRowIndex = this.placeholderRowIndex = -1, this.refresh();
 },
 beginPinnedReorder: function(e) {
 this.buildPinnedReorderContainer(), this.doSetupPinnedReorderComponents(enyo.mixin(e, {
@@ -5520,6 +5529,11 @@ return t.style.height = n.height + "px", t.style.width = n.width + "px", t;
 removePlaceholderNode: function() {
 this.removeNode(this.placeholderNode), this.placeholderNode = null;
 },
+removeDraggingRowNode: function() {
+this.draggingRowNode = null;
+var e = this.$.holdingarea.hasNode();
+e.innerHTML = "";
+},
 removeNode: function(e) {
 if (!e || !e.parentNode) return;
 e.parentNode.removeChild(e);
@@ -5547,6 +5561,9 @@ return e.style.display = "block", e;
 dropPinnedRow: function(e) {
 this.moveReorderedContainerToDroppedPosition(e), this.completeReorderTimeout = setTimeout(enyo.bind(this, this.completeFinishReordering, e), 100);
 return;
+},
+cancelPinnedMode: function(e) {
+this.placeholderRowIndex = this.draggingRowIndex, this.dropPinnedRow(e);
 },
 getRowIndexFromCoordinate: function(e) {
 var t = this.getScrollTop() + e - enyo.dom.calcNodePosition(this.hasNode()).top;
@@ -5817,6 +5834,10 @@ tag: null,
 name: "client"
 } ]
 }, {
+name: "holdingarea",
+allowHtml: !0,
+classes: "enyo-list-holdingarea"
+}, {
 name: "page0",
 allowHtml: !0,
 classes: "enyo-list-page"
@@ -5827,8 +5848,7 @@ classes: "enyo-list-page"
 }, {
 name: "belowClient"
 }, {
-name: "placeholder",
-classes: "enyo-list-placeholder"
+name: "placeholder"
 }, {
 name: "swipeableComponents",
 style: "position:absolute; display:block; top:-1000px; left:0px;"
@@ -7782,8 +7802,12 @@ from: ".controller.data",
 to: ".data"
 } ],
 initComponents: function() {
-var e = this.kindComponents || this.components || [], t = e[0], n = t.mixins || [], r;
-this.findAndInstance("defaultChildController"), t.controller = this.childController, t.mixins = enyo.merge(n, this.childMixins), this.components = e, this.kindComponents = [], this.inherited(arguments);
+var e = this.kindComponents || this.components || [], t = function(e) {
+return e.length > 1 ? {
+components: e
+} : e[0];
+}(e), n = t.mixins || [], r;
+this.findAndInstance("defaultChildController"), t.controller = this.childController, t.mixins = enyo.merge(n, this.childMixins), this.components = [ t ], this.kindComponents = [], this.inherited(arguments);
 },
 defaultChildControllerFindAndInstance: function(e, t) {
 this.childController = t;
