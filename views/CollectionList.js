@@ -62,13 +62,15 @@ enyo.kind({
     //*@protected
     initComponents: function () {
         var components = this.kindComponents || this.components || [];
-        var def = components[0];
+        var def = (function (children) {
+            return children.length > 1? {components: children}: children[0];
+        }(components));
         var mixins = def.mixins || [];
         var ctor;
         this.findAndInstance("defaultChildController");
         def.controller = this.childController;
         def.mixins = enyo.merge(mixins, this.childMixins);
-        this.components = components;
+        this.components = [def];
         this.kindComponents = [];
         this.inherited(arguments);
     },
