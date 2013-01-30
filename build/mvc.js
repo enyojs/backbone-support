@@ -1,7 +1,7 @@
 
 // minifier: path aliases
 
-enyo.path.addPaths({layout: "../layout/", ext: "ext/", models: "models/", controllers: "controllers/", views: "views/"});
+enyo.path.addPaths({layout: "/Users/cdavis/Devel/experiments/HTML5tx/example1/lib/layout/", ext: "ext/", models: "models/", controllers: "controllers/", views: "views/"});
 
 // jquery-1.8.3-min.js
 
@@ -4956,7 +4956,6 @@ isSelected: function(e) {
 return this.getSelection().isSelected(e);
 },
 renderRow: function(e) {
-if (e < this.rowOffset || e >= this.count + this.rowOffset) return;
 this.setupItem(e);
 var t = this.fetchRowNode(e);
 t && (enyo.dom.setInnerHtml(t, this.$.client.generateChildHtml()), this.$.client.teardownChildren(), this.doRenderRow({
