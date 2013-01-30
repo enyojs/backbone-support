@@ -48,7 +48,7 @@ enyo.kind({
         // other
         onSetupItem: "setupItem"
     },
-    
+
     //*@protected
     bindings: [
         {from: ".controller.length", to: ".length"},
@@ -109,16 +109,6 @@ enyo.kind({
                 this.reset();
             } this.refresh();
         }
-    },
-    
-    //*@protected
-    countChanged: function () {
-        if (this.count) {
-            if (this.$.generator) {
-                this.$.generator.count = this.count;
-            }
-        }
-        this.inherited(arguments);
     },
     
     //*@protected
