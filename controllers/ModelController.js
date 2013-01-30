@@ -162,7 +162,14 @@ enyo.kind({
     },
     //*@protected
     notifyAll: function () {
-        this.notifyAttributes();
+        if (this.get("data")) this.notifyAttributes();
+        else {
+            // we need to notify the observers that might
+            // be listening and then sync our bindings so
+            // we can clear fields that have no value
+            this.inherited(arguments);
+            this.sync();
+        }
     },
     //*@protected
     /**
