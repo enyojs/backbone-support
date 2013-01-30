@@ -7197,6 +7197,31 @@ for (var t = 0; t < this.images.length; t++) enyo.indexOf(t, e) === -1 && this.$
 }
 });
 
+// /Users/cdavis/Devel/experiments/HTML5tx/example1/source/generator.js
+
+(function(e) {
+var t = "abcdefghijklmnopqrstuvwxyz", n = "aeiou", r = "bcdfghjklmnpqrstvwxyz", i = function(e, t) {
+return Math.round(Math.random() * 1e3 % ((t || 0) - (e || 0) || 1)) + (e || 0);
+};
+e.generator = {
+letter: function() {
+return t[i(0, 25)];
+},
+vowel: function() {
+return n[i(0, 4)];
+},
+name: function() {
+var e = i(4, 10), t = "";
+while (e > -1) t.length ? ~r.indexOf(t.slice(-1)) ? t += this.vowel() : t += this.letter() : t += this.letter(), --e;
+return t[0].toUpperCase() + t.slice(1);
+},
+person: function() {
+var e = {};
+return e.first = this.name(), e.last = this.name(), e.age = i(17, 99), e.email = e.first + "." + e.last + "@gmail.com", e;
+}
+};
+})(window);
+
 // SelectionSupport.js
 
 enyo.Mixin({
@@ -7822,9 +7847,6 @@ var n = t.model;
 },
 lengthChanged: function(e, t) {
 t && (0 === e && this.reset(), this.refresh());
-},
-countChanged: function() {
-this.count && this.$.generator && (this.$.generator.count = this.count), this.inherited(arguments);
 },
 repeaterDidChange: function(e, t) {
 var n = t.values, r = enyo.keys(n), i, s = r.length, o = 0;
