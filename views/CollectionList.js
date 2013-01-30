@@ -94,10 +94,10 @@ enyo.kind({
     //*@protected
     setupItem: function (sender, event) {
         var model = event.model;
-        if (true === event.selected) {
-            if (model) {
-                this.controller.select(model);
-            }
+        if (true === event.selected && model) {
+            this.controller.select(model);
+        } else if (!event.selected && model) {
+            model.set("selected", false);
         }
         if (model) this.childController.set("model", model);
     },
