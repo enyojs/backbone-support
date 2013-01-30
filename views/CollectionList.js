@@ -118,15 +118,55 @@ enyo.kind({
         var idx;
         var len = indices.length;
         var pos = 0;
+        var data = this.get("data");
+        var model;
         for (; pos < len; ++pos) {
             idx = indices[pos];
-            this.renderRow(parseInt(idx));
+            model = data[idx];
+            if (model && model.get("selected") !== this.isSelected(idx)) {
+                // this implies the model's selected state was changed
+                // but the view isn't aware of it because its selection
+                // isn't driven by the data............S I G H.........
+                this.deselect(idx);
+                // the above forces a render on the row so we don't have
+                // have to do it now
+            } else this.renderRow(parseInt(idx));
         }
     },
     
     //*@protected
     repeaterDidReset: function (sender, event) {
         this.reset();
+    },
+    
+    //*@protected
+    repeaterDidRemove: function (sender, event) {
+        // ok, so, again, since the state of selection and rendering
+        // is not controller by the data, we have to find a way to
+        // keep them synchronized, the following happens because it is
+        // possible that if a row was selected but the model had its
+        // destroy method executed the list will still think the row is
+        // selected and automatically cause the model that gets moved
+        // into that index to be selected, here we catch that scenario
+        // make sure to deselect the row
+        var values = event.values;
+        var indices = enyo.keys(values);
+        var idx;
+        var pos = 0;
+        var len = indices.length;
+        var data = this.get("data");
+        var model;
+        for (; pos < len; ++pos) {
+            idx = indices[pos];
+            model = values[idx];
+            if (model) {
+                if (model.changed) {
+                    if (false === model.changed.selected) {
+                        this.deselect(idx);
+                    }
+                }
+            }
+        }
     }
     
 });
