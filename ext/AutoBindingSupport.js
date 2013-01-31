@@ -24,7 +24,13 @@
         didSetupAutoBindings: false,
         //*@protected
         initMixin: function () {
-            this.autoCache = {};
+            var cache = this._auto_cache = {};
+            var ctor = this._binding_ctor = enyo.getPath(this.defaultBindingKind);
+            var keys = enyo.keys(defaults);
+            if (ctor !== enyo.Binding) {
+                cache.defaults = enyo.mixin(enyo.clone(defaults), 
+                    enyo.only(keys, ctor.prototype));
+            } else cache.defaults = defaults;
             this.setupAutoBindings();
         },
         //*@protected
@@ -57,11 +63,12 @@
         },
         //*@protected
         bindProperties: function (control) {
-            return enyo.mixin(enyo.clone(defaults), enyo.remap(remapped, control));
+            var cache = this._auto_cache.defaults;
+            return enyo.mixin(enyo.clone(cache), enyo.remap(remapped, control));
         },
         //*@protected
         bindableControls: enyo.Computed(function (control) {
-            var cache = this.autoCache["bindableControls"];
+            var cache = this._auto_cache["bindableControls"];
             if (cache) return enyo.clone(cache);
             var bindable = [];
             var control = control || this;
@@ -72,7 +79,7 @@
                 bindable = bindable.concat(this.bindableControls(controls[idx]));
             }
             if ("bindFrom" in control) bindable.push(control);
-            if (this === control) this.autoCache["bindableControls"] = enyo.clone(bindable);
+            if (this === control) this._auto_cache["bindableControls"] = enyo.clone(bindable);
             return bindable;
         }),
         //*@protected
