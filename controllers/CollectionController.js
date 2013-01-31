@@ -157,6 +157,8 @@ enyo.kind({
             // make sure to start these back up
             this.startNotifications();
         }
+        
+        if (inst) this.dispatchBubble("collectionchanged", {}, this);
     },
     
     //*@protected

@@ -23,6 +23,11 @@ enyo.kind({
     // PROTECTED PROPERTIES
     
     //*@protected
-    defaultChildController: "enyo.ModelController"
+    defaultChildController: "enyo.ModelController",
+    
+    //*@protected
+    handlers: {
+        collectionchanged: "repeaterDidReset"
+    }
     
 });
