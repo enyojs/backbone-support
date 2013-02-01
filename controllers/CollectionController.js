@@ -33,6 +33,8 @@ enyo.kind({
     
     //*@protected
     _last_collection: null,
+    //*@protected
+    _last_initialized: null,
     
     // ...........................
     // COMPUTED PROPERTIES
@@ -196,6 +198,10 @@ enyo.kind({
         // if we couldn't find one, nothing to do
         if (!collection) return;
         for (key in responders) collection.off(key, responders[key]);  
+        if (collection.controllers) {
+            delete collection.controllers[this.id];
+        }
+        this._last_initialized = null;
     },
     
     //*@protected
@@ -203,11 +209,27 @@ enyo.kind({
         // we need to initialize 
         var responders = this.responders;
         var key;
+        var time = enyo.bench();
+        var last = this._last_initialzed;
+        // if we don't have an id we were called prematurely and
+        // need to do nothing at this point
+        if (!this.id) return;
+        if (collection.controllers) {
+            if (collection.controllers[this.id]) {
+                if (last === collection.controllers[this.id]) return;
+            }
+        }
+        
         for (key in responders) {
             if (!responders.hasOwnProperty(key)) continue;
             // using the backbone api we add our listeners
             collection.on(key, responders[key]);
         }
+        // we now track the last time we initialized the collection
+        // on the collection with our id for comparison purposes
+        if (!collection.controllers) collection.controllers = {};
+        collection.controllers[this.id] = time;
+        this._last_initialized = time;
         this.stopNotifications();
         this.set("length", collection.length);
         this.set("models", collection.models, true);
