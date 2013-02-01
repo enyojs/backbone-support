@@ -53,6 +53,7 @@ enyo.kind({
     bindings: [
         {from: ".controller.length", to: ".length"},
         {from: ".length", to: ".count"},
+        {from: ".controller.selection", to: ".selection"},
         {from: ".controller.data", to: ".data"}
     ],
     
@@ -165,6 +166,17 @@ enyo.kind({
                         this.deselect(idx);
                     }
                 }
+            }
+        }
+    },
+    
+    //*@protected
+    selectionChanged: function () {
+        if (this.selection) {
+            debugger
+            var idx = this.controller.indexOf(this.selection);
+            if (!this.getSelection().isSelected(idx)) {
+                this.select(idx);
             }
         }
     }
