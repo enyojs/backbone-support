@@ -1,5 +1,5 @@
 
-/* /Users/cdavis/Devel/experiments/HTML5tx/example1/lib/layout/fittable/source/FittableLayout.css */
+/* ../layout/fittable/source/FittableLayout.css */
 
 .enyo-fittable-rows-layout {
 	position: relative;
@@ -71,7 +71,7 @@
 	margin-bottom: 0 !important;
 }
 
-/* /Users/cdavis/Devel/experiments/HTML5tx/example1/lib/layout/list/source/List.css */
+/* ../layout/list/source/List.css */
 
 .enyo-list {
 	position: relative;
@@ -123,7 +123,7 @@
 	transition: top 0.1s linear, left 0.1s linear;
 }
 
-/* /Users/cdavis/Devel/experiments/HTML5tx/example1/lib/layout/list/source/PulldownList.css */
+/* ../layout/list/source/PulldownList.css */
 
 .enyo-list-pulldown {
 	position: absolute;
@@ -186,7 +186,7 @@
 	-ms-transform: rotate(180deg);
 }
 
-/* /Users/cdavis/Devel/experiments/HTML5tx/example1/lib/layout/panels/source/arrangers/Arranger.css */
+/* ../layout/panels/source/arrangers/Arranger.css */
 
 .enyo-arranger {
 	position: relative;
@@ -217,7 +217,7 @@
 }
 
 
-/* /Users/cdavis/Devel/experiments/HTML5tx/example1/lib/layout/panels/source/Panels.css */
+/* ../layout/panels/source/Panels.css */
 
 .enyo-panels {
 }
@@ -232,7 +232,7 @@
 	}
 }
 
-/* /Users/cdavis/Devel/experiments/HTML5tx/example1/lib/layout/tree/source/Node.css */
+/* ../layout/tree/source/Node.css */
 
 .enyo-node {
 	cursor: default;
@@ -266,7 +266,7 @@
 }
 
 
-/* /Users/cdavis/Devel/experiments/HTML5tx/example1/lib/layout/imageview/source/ImageViewPin.css */
+/* ../layout/imageview/source/ImageViewPin.css */
 
 
 .pinDebug {
