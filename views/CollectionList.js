@@ -4,7 +4,8 @@
     This is an interim-kind. It is designed to be functional - integrating
     an API similar to _enyo.List_ and work with _enyo.CollectionController_s
     using _Backbone.Collection_s and _Backbone.Model_s. __It will not exist
-    in the future.__ A kind with a similar API will replace it.
+    in the future.__ A kind with a similar API will replace it. Currently
+    does not support multiselect _completely_.
 */
 enyo.kind({
     
@@ -119,19 +120,9 @@ enyo.kind({
         var idx;
         var len = indices.length;
         var pos = 0;
-        var data = this.get("data");
-        var model;
         for (; pos < len; ++pos) {
             idx = indices[pos];
-            model = data[idx];
-            if (model && model.get("selected") !== this.isSelected(idx)) {
-                // this implies the model's selected state was changed
-                // but the view isn't aware of it because its selection
-                // isn't driven by the data............S I G H.........
-                this.deselect(idx);
-                // the above forces a render on the row so we don't have
-                // have to do it now
-            } else this.renderRow(parseInt(idx));
+            this.renderRow(parseInt(idx));
         }
     },
     
@@ -173,10 +164,17 @@ enyo.kind({
     //*@protected
     selectionChanged: function () {
         if (this.selection) {
-            debugger
             var idx = this.controller.indexOf(this.selection);
             if (!this.getSelection().isSelected(idx)) {
                 this.select(idx);
+            }
+        } else {
+            var selection = this.getSelection();
+            for (var key in selection.selected) {
+                if (true === selection.selected[key]) {
+                    selection.clear();
+                    break;
+                }
             }
         }
     }
