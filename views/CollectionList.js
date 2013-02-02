@@ -65,7 +65,7 @@ enyo.kind({
     initComponents: function () {
         var components = this.kindComponents || this.components || [];
         var def = (function (children) {
-            return children.length > 1? {components: children}: children[0];
+            return children.length > 1? {components: children}: enyo.clone(children[0]);
         }(components));
         var mixins = def.mixins || [];
         var ctor;
