@@ -17,13 +17,34 @@
         debug: false
     };
     
-    enyo.Mixin({
+    enyo.kind({
+    
+        // ...........................
+        // PUBLIC PROPERTIES
+        
         //*@public
         name: "enyo.AutoBindingSupport",
+    
+        //*@public
+        kind: "enyo.Mixin",
+    
+        // ...........................
+        // PROTECTED PROPERTIES
+    
         //*@protected
-        didSetupAutoBindings: false,
+        _did_setup_auto_bindings: false,
+    
+        // ...........................
+        // COMPUTED PROPERTIES
+    
+        // ...........................
+        // PUBLIC METHODS
+    
+        // ...........................
+        // PROTECTED METHODS
+    
         //*@protected
-        initMixin: function () {
+        create: function () {
             var cache = this._auto_cache = {};
             var ctor = this._binding_ctor = enyo.getPath(this.defaultBindingKind);
             var keys = enyo.keys(defaults);
@@ -33,20 +54,23 @@
             } else cache.defaults = defaults;
             this.setupAutoBindings();
         },
+        
         //*@protected
         autoBinding: function () {
             var bind = this.binding.apply(this, arguments);
             bind.autoBindingId = enyo.uid("autoBinding");
         },
+        
         //*@protected
         autoBindings: enyo.Computed(function () {
             return enyo.filter(this.bindings || [], function (bind) {
                 return bind && bind.autoBindingId;
             });
         }),
+        
         //*@protected
         setupAutoBindings: function () {
-            if (this.didSetupAutoBindings) return;
+            if (this._did_setup_auto_bindings) return;
             if (!this.controller) return;
             var controls = this.get("bindableControls");
             var idx = 0;
@@ -59,13 +83,15 @@
                 props = this.bindProperties(control);
                 this.autoBinding(props, {source: controller, target: control});
             }
-            this.didSetupAutoBindings = true;
+            this._did_setup_auto_bindings = true;
         },
+        
         //*@protected
         bindProperties: function (control) {
             var cache = this._auto_cache.defaults;
             return enyo.mixin(enyo.clone(cache), enyo.remap(remapped, control));
         },
+        
         //*@protected
         bindableControls: enyo.Computed(function (control) {
             var cache = this._auto_cache["bindableControls"];
@@ -82,15 +108,20 @@
             if (this === control) this._auto_cache["bindableControls"] = enyo.clone(bindable);
             return bindable;
         }),
+        
         //*@protected
         controllerDidChange: enyo.Observer(function () {
             this.inherited(arguments);
             if (this.controller) {
-                if (!this.didSetupAutoBindings) {
+                if (!this._did_setup_auto_bindings) {
                     this.setupAutoBindings();
                 }
             }
         }, "controller")
+    
+        // ...........................
+        // OBSERVERS
+
     });
     
 }());

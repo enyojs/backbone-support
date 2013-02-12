@@ -1,20 +1,30 @@
 //*@public
 /**
 */
-enyo.Mixin({
+enyo.kind({
+    
+    // ...........................
+    // PUBLIC PROPERTIES
     
     //*@public
     name: "enyo.CollectionArraySupport",
     
+    //*@public
+    kind: "enyo.Mixin",
+    
+    // ...........................
+    // PROTECTED PROPERTIES
+    
+    // ...........................
+    // COMPUTED PROPERTIES
+    
     // ...........................
     // PUBLIC METHODS
     
+    //*@public
     update: function (models, options) {
         return this.collection.update(models, options);
     },
-    
-    // ...........................
-    // ARRAY CONTROLLER OVERLOAD
     
     //*@public
     push: function (model, options) {
@@ -175,4 +185,10 @@ enyo.Mixin({
         this.dispatchBubble("didchange", {values: changeset}, this);
     }
     
+    // ...........................
+    // PROTECTED METHODS
+    
+    // ...........................
+    // OBSERVERS
+
 });
