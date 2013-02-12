@@ -1,10 +1,16 @@
 //*@public
 /**
 */
-enyo.Mixin({
+enyo.kind({
+    
+    // ...........................
+    // PUBLIC PROPERTIES
     
     //*@public
     name: "enyo.SelectionSupport",
+    
+    //*@public
+    kind: "enyo.Mixin",
     
     //*@public
     multiselect: false,
@@ -12,19 +18,14 @@ enyo.Mixin({
     //*@public
     selection: null,
     
-    //*@protected
-    initMixin: function () {
-        if (this.createResponders) this.createResponders();
-    },
+    // ...........................
+    // PROTECTED PROPERTIES
     
-    //@*protected
-    collectionDidChange: function (model) {
-        var changed = model.changedAttributes() || {};
-        if ("selected" in changed) {
-            this.selectedModelChanged(model);
-        }
-        return this.inherited(arguments);
-    },
+    // ...........................
+    // COMPUTED PROPERTIES
+    
+    // ...........................
+    // PUBLIC METHODS
     
     //*@public
     select: function (model) {
@@ -126,6 +127,26 @@ enyo.Mixin({
         }
     },
     
+    // ...........................
+    // PROTECTED METHODS
+    
+    //*@protected
+    initMixin: function () {
+        if (this.createResponders) this.createResponders();
+    },
+    
+    //@*protected
+    collectionDidChange: function (model) {
+        var changed = model.changedAttributes() || {};
+        if ("selected" in changed) {
+            this.selectedModelChanged(model);
+        }
+        return this.inherited(arguments);
+    },
+    
+    
+
+    
     //*@protected
     collectionDidReset: function (collection, options) {
         this.deselect();
@@ -174,4 +195,7 @@ enyo.Mixin({
         this.inherited(arguments);
     }
     
+    // ...........................
+    // OBSERVERS
+
 });
