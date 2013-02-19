@@ -19,7 +19,7 @@ enyo.kind({
     // PROTECTED PROPERTIES
     
     //*@protected
-    concat: "childMixins",
+    concat: ["childMixins"],
     
     //*@protected
     handlers: {
@@ -208,7 +208,7 @@ enyo.kind({
     repeaterDidReset: function (sender, event) {
         this.sync();
         this.prune();
-    },
+    }
     
     // ...........................
     // OBSERVERS
