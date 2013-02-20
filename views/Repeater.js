@@ -142,6 +142,7 @@ enyo.kind({
         // note that names on the children will be fine because they will
         // become kindComponents of the child when it is implemented
         delete def.name;
+        def.kind = def.kind || "enyo.View";
         // this is where the components on the child definition become
         // kind components (if they weren't already)
         this.child = enyo.kind(def);
