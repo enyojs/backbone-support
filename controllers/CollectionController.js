@@ -46,7 +46,7 @@ enyo.kind({
     */
     data: enyo.Computed(function (data) {
         return this.models;
-    }, "models", "model"),
+    }, "models", "model", {cached: true}),
     
     // ...........................
     // PUBLIC METHODS

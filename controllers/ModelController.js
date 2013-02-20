@@ -15,7 +15,7 @@ enyo.kind({
         if (enyo.exists(model)) {
             this.data = model;
         } else return this.get("data");
-    }, "data"),
+    }, "data", {cached: true}),
     //*@protected
     constructor: function () {
         this.inherited(arguments);
