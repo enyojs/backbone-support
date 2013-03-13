@@ -46,7 +46,7 @@ enyo.kind({
     */
     length: enyo.Computed(function () {
         return (this.get("data") || []).length;
-    }, "data", {cached: true}),
+    }, "data"),
     
     // ...........................
     // PUBLIC METHODS
