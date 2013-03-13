@@ -1,7 +1,7 @@
 //*@public
 /**
 */
-enyo.kind({
+enyo.createMixin({
     
     // ...........................
     // PUBLIC PROPERTIES
@@ -9,11 +9,11 @@ enyo.kind({
     //*@public
     name: "enyo.CollectionListRowSupport",
     
-    //*@public
-    kind: "enyo.Mixin",
-    
     // ...........................
     // PROTECTED PROPERTIES
+    
+    //*@protected
+    _supports_collection_list_row: true,
     
     // ...........................
     // COMPUTED PROPERTIES

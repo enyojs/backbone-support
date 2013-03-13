@@ -31,7 +31,10 @@ enyo.kind({
     defaultChildController: "enyo.ModelController",
     
     //*@public
-    childMixins: ["enyo.AutoBindingSupport", "enyo.CollectionListRowSupport"],
+    childMixins: [
+        "enyo.AutoBindingSupport",
+        "enyo.CollectionListRowSupport"
+    ],
     
     // ...........................
     // PROTECTED PROPERTIES

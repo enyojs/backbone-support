@@ -1,19 +1,19 @@
 //*@public
 /**
 */
-enyo.kind({
+enyo.createMixin({
     
     // ...........................
     // PUBLIC PROPERTIES
     
     //*@public
     name: "enyo.CollectionArraySupport",
-    
-    //*@public
-    kind: "enyo.Mixin",
-    
+        
     // ...........................
     // PROTECTED PROPERTIES
+    
+    //*@protected
+    _supports_collection_array: true,
     
     // ...........................
     // COMPUTED PROPERTIES

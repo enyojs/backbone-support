@@ -1,16 +1,13 @@
 //*@public
 /**
 */
-enyo.kind({
+enyo.createMixin({
     
     // ...........................
     // PUBLIC PROPERTIES
     
     //*@public
     name: "enyo.SelectionSupport",
-    
-    //*@public
-    kind: "enyo.Mixin",
     
     //*@public
     multiselect: false,
@@ -20,6 +17,9 @@ enyo.kind({
     
     // ...........................
     // PROTECTED PROPERTIES
+    
+    //*@protected
+    _supports_selection: true,
     
     // ...........................
     // COMPUTED PROPERTIES
@@ -131,7 +131,7 @@ enyo.kind({
     // PROTECTED METHODS
     
     //*@protected
-    initMixin: function () {
+    create: function () {
         if (this.createResponders) this.createResponders();
     },
     

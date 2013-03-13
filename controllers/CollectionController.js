@@ -26,7 +26,10 @@ enyo.kind({
     models: null,
     
     //*@public
-    mixins: ["enyo.SelectionSupport", "enyo.CollectionArraySupport"],
+    mixins: [
+        "enyo.SelectionSupport",
+        "enyo.CollectionArraySupport"
+    ],
     
     // ...........................
     // PROTECTED PROPERTIES
