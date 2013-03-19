@@ -72,9 +72,14 @@ enyo.kind({
         }(components));
         var mixins = def.mixins || [];
         var ctor;
+        var name;
         this.findAndInstance("defaultChildController");
         def.controller = this.childController;
         def.mixins = enyo.merge(mixins, this.childMixins);
+        name = def.name || enyo.uid("_list_component_");
+        delete def.name;
+        ctor = enyo.kind(def);
+        def = {name: name, kind: ctor};
         this.components = [def];
         this.kindComponents = [];
         this.inherited(arguments);
