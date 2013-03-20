@@ -47,7 +47,7 @@ enyo.kind({
         Override this computed property to return any filtered
         content.
     */
-    data: enyo.Computed(function (data) {
+    data: enyo.computed(function (data) {
         return this.models;
     }, "models", "model", {cached: true}),
     

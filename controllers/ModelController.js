@@ -11,7 +11,7 @@ enyo.kind({
         modelControllerCount: 0
     },
     //*@public
-    model: enyo.Computed(function (model) {
+    model: enyo.computed(function (model) {
         if (enyo.exists(model)) {
             this.data = model;
         } else return this.get("data");
@@ -190,7 +190,7 @@ enyo.kind({
     },
     
     //*@protected
-    dataDidChange: enyo.Observer(function () {
+    dataDidChange: enyo.observer(function () {
         this.inherited(arguments);
     }, "data", "model")
 });

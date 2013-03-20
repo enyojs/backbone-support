@@ -44,7 +44,7 @@ enyo.kind({
         be a subset (e.g. filtered) of the total data. This will
         the equivalent of the number of children that are rendered.
     */
-    length: enyo.Computed(function () {
+    length: enyo.computed(function () {
         return (this.get("data") || []).length;
     }, "data"),
     

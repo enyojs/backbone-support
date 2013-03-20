@@ -33,7 +33,7 @@ enyo.createMixin({
     // OBSERVERS
     
     //*@protected
-    _selected_changed: enyo.Observer(function () {
+    _selected_changed: enyo.observer(function () {
         this.addRemoveClass("selected", this.selected);
     }, "selected")
 

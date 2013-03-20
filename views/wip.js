@@ -57,12 +57,12 @@ enyo.kind({
     // COMPUTED PROPERTIES
     
     //*@public
-    rows: enyo.Computed(function () {
+    rows: enyo.computed(function () {
         
     }),
     
     //*@protected
-    _data_frame: enyo.Computed(function () {
+    _data_frame: enyo.computed(function () {
         // TESTING
         return {start: 0, end: 30};
     }),
