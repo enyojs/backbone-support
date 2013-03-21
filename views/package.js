@@ -1,5 +1,5 @@
 enyo.depends(
-    "Repeater.js",
-    "CollectionRepeater.js",
-    "CollectionList.js"
+	"Repeater.js",
+	"CollectionRepeater.js",
+	"CollectionList.js"
 );

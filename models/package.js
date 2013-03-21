@@ -1,4 +1,4 @@
 enyo.depends(
-  "Model.js",
-  "Collection.js"
+	"Model.js",
+	"Collection.js"
 );

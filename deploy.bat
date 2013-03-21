@@ -30,7 +30,7 @@ XCOPY %SOURCE%foss\backbone-relational\backbone-relational.js %TARGET%\foss\back
 XCOPY %SOURCE%foss\jquery\jquery-1.8.3-min.js %TARGET%\foss\jquery\jquery-1.8.3-min.js /Q /E
 
 FOR %%DIR IN ("controllers" "ext" "models" "views") DO (
-  XCOPY %SOURCE%%%DIR\*.* %TARGET%\%%DIR\ /Q /E
+	XCOPY %SOURCE%%%DIR\*.* %TARGET%\%%DIR\ /Q /E
 )
 
 ENDLOCAL
