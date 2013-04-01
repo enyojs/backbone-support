@@ -1,11 +1,12 @@
 
 //*@public
 /**
-	This is an interim-kind. It is designed to be functional - integrating
-	an API similar to _enyo.List_ and work with _enyo.CollectionController_s
-	using _Backbone.Collection_s and _Backbone.Model_s. __It will not exist
-	in the future.__ A kind with a similar API will replace it. Currently
-	does not support multiselect _completely_.
+	This is an interim kind. It is designed to be functional, integrating
+	an API similar to that of _enyo.List_ and working with instances of
+	_enyo.CollectionController_ that use _Backbone.Collection_ and
+	_Backbone.Model_ objects. This kind will not exist in the future; a
+	kind with a similar API will replace it. Currently, this kind does not
+	support multiselect _completely_.
 */
 enyo.kind({
 	
@@ -141,14 +142,13 @@ enyo.kind({
 	
 	//*@protected
 	repeaterDidRemove: function (sender, event) {
-		// ok, so, again, since the state of selection and rendering
-		// is not controller by the data, we have to find a way to
-		// keep them synchronized, the following happens because it is
-		// possible that if a row was selected but the model had its
-		// destroy method executed the list will still think the row is
-		// selected and automatically cause the model that gets moved
-		// into that index to be selected, here we catch that scenario
-		// make sure to deselect the row
+		// Again, since the selection and rendering states are not
+		// controlled by the data, we have to find a way to keep them
+		// in sync. It is possible that, if a row was selected but the
+		// model had its _destroy_ method executed, the list will still
+		// think the row is selected and automatically cause the model
+		// that is moved into that index to be selected; we detect that
+		//here and deselect the row.
 		var values = event.values;
 		var indices = enyo.keys(values);
 		var idx;

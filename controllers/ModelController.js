@@ -79,7 +79,7 @@ enyo.kind({
 	},
 	//*@public
 	/**
-		When the underlying proxied model has changed this method is
+		When the underlying proxied model has changed, this method is
 		notified. It simply finds any of the changed attributes and
 		notifies any observers/bindings of the change.
 	*/
@@ -95,7 +95,7 @@ enyo.kind({
 	},
 	//*@public
 	/**
-		When a model is destroyed we need to catch the event and releaseModel
+		When a model is destroyed, we need to catch the event and releaseModel
 		it from our observers.
 	*/
 	didDestroy: function () {
@@ -133,7 +133,7 @@ enyo.kind({
 		var data = this.get("data");
 		var prev;
 		// the model's _set_ API accepts an object/hash of properties to
-		// set so that is a sure way to know we want to set this on the model
+		// set, so that is a sure way to know we want to set this on the model
 		// and not the controller - the only other way we can be sure is if
 		// the property exists in the model attributes
 		if (data && ("object" === typeof prop || prop in data.attributes)) {
@@ -146,10 +146,9 @@ enyo.kind({
 	},
 	//*@public
 	/**
-		Takes a string parameter and returns a boolean true|false
-		depending on whether or not the parameter is an attribute
-		of the model. If no model is present it will always return
-		false.
+		Takes a string parameter and returns a boolean true or false
+		indicating whether or not the parameter is an attribute	of the model.
+		Returns false if no model is present.
 	*/
 	isAttribute: function (prop) {
 		var model = this.get("data");

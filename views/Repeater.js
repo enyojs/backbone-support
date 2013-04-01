@@ -40,8 +40,8 @@ enyo.kind({
 	//*@public
 	/**
 		A computed property that represents the length of the
-		current _data_ value as data may be overloaded and only
-		be a subset (e.g. filtered) of the total data. This will
+		current _data_ value, as _data_ may be overloaded and only
+		be a (filtered) subset of the total data. This will be
 		the equivalent of the number of children that are rendered.
 	*/
 	length: enyo.computed(function () {
@@ -117,16 +117,16 @@ enyo.kind({
 	
 	//*@protected
 	initComponents: function () {
-		// we intercept the original components definition to hyjack
+		// we intercept the original components definition to hijack
 		// the normal flow of initializing components
 		var components = this.kindComponents || this.components || [];
-		// we try and retrieve the definition/configuration for the child
-		// component/view we will need to use in the repeater, if there are
-		// multiple children we combine them into a wrapper view
-		var def = (function (children) {
+		// we try to retrieve the definition/configuration for the child
+		// component/view we will need to use in the repeater; if there are
+		// multiple children, we combine them into a wrapper view
+		var def = (function (children) {2
 			return children.length > 1? {components: children}: enyo.clone(children[0]);
 		}(components));
-		// we grab a reference to any mixins the definition might have
+		// we grab a reference to any mixins the definition might have,
 		// so we can add the one we know needs to be there
 		var mixins = def.mixins || [];
 		// now we add the auto-bindings support mixin so it will always
@@ -137,16 +137,16 @@ enyo.kind({
 		this.kindComponents = this.components = null;
 		// finish our own normal initialization without component creation
 		this.inherited(arguments);
-		// if the child definition itself has a name it won't work because
-		// we'll be repeating it so we remove it
+		// if the child definition itself has a name, it won't work because
+		// we'll be repeating it, so we remove it;
 		// note that names on the children will be fine because they will
-		// become kindComponents of the child when it is implemented
+		// become kind components of the child when it is implemented
 		delete def.name;
 		def.kind = def.kind || "enyo.View";
 		// this is where the components on the child definition become
 		// kind components (if they weren't already)
 		this.child = enyo.kind(def);
-		// if the definition for the child does not have a controller set
+		// if the definition for the child does not have a controller set,
 		// we apply our default
 		if (!this.child.prototype.controller) {
 			this.child.prototype.controller = this.defaultChildController;
@@ -155,11 +155,11 @@ enyo.kind({
 	
 	//*@protected
 	/**
-		Whenever a new value is added to the dataset we receive this
-		event. Because it is an addition we know we'll be adding a
-		child or some children (depending on how many elements were added).
-		This allows us find and render only the new elements and when
-		necessary rerender any changed indices only.
+		Whenever a new value is added to the dataset, we receive this
+		event. Because it is an addition, we know we'll be adding one or
+		more children (depending on how many elements were added).
+		This lets us find and render only the new elements and, when
+		necessary, rerender only those indices that have changed.
 	*/
 	repeaterDidAdd: function (sender, event) {
 		var values = event.values;
